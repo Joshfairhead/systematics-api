@@ -3,8 +3,8 @@ use crate::core::state_manager::Index;
 pub struct K4Topology;
 
 impl K4Topology {
-    pub const INDEXES: [Index; 4] = [0, 1, 2, 3];
-    pub const EDGES: [(Index, Index); 6] = [
+    pub const INDEX: [Index; 4] = [0, 1, 2, 3];
+    pub const INDICES: [(Index, Index); 6] = [
         (0, 1),  // ideal-directive
         (0, 2),  // ideal-instrumental
         (0, 3),  // ideal-ground

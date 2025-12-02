@@ -3,8 +3,8 @@ use crate::core::state_manager::Index;
 pub struct K11Topology;
 
 impl K11Topology {
-    pub const INDEXES: [Index; 11] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    pub const EDGES: [(Index, Index); 55] = [
+    pub const INDEX: [Index; 11] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    pub const INDICES: [(Index, Index); 55] = [
         (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (0, 9), (0, 10),
         (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10),
         (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9), (2, 10),
