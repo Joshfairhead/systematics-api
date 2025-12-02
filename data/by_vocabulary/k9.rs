@@ -50,4 +50,5 @@ impl EnneadVocabulary {
         ("Needs Research35", "Position7", "Position9"),
         ("Needs Research36", "Position8", "Position9"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

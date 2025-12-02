@@ -25,4 +25,5 @@ impl HeptadVocabulary {
         ("Needs Research", "Application", "Value"),
         ("Needs Research", "Delivery", "Value"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

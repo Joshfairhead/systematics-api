@@ -19,4 +19,5 @@ impl HexadVocabulary {
         ("Step14", "Criteria", "Priorities"),
         ("Step15", "Facts", "Priorities"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

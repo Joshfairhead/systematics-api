@@ -7,4 +7,5 @@ impl TriadVocabulary {
         ("Act2", "Function", "Being"),
         ("Act3", "Being", "Will"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

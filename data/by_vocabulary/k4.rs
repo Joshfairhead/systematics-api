@@ -10,4 +10,5 @@ impl TetradVocabulary {
         ("Material Mastery", "Directive", "Ground"),
         ("Technical Power", "Instrumental", "Ground"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

@@ -5,4 +5,5 @@ impl DyadVocabulary {
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 1] = [
         ("Force1", "Essence", "Existence"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

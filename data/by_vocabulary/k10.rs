@@ -60,4 +60,5 @@ impl DecadVocabulary {
         ("Needs Research44", "Position8", "Position10"),
         ("Needs Research45", "Position9", "Position10"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

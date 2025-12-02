@@ -83,4 +83,5 @@ impl DodecadVocabulary {
         ("Needs Research65", "Relatedness", "Wholeness"),
         ("Needs Research66", "Polarity", "Wholeness"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

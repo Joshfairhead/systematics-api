@@ -14,4 +14,5 @@ impl PentadVocabulary {
         ("Form", "Lower Potential", "Purpose"),
         ("Function", "Higher Potential", "Source"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }

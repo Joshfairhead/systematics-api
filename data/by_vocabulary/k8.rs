@@ -41,4 +41,5 @@ impl OctadVocabulary {
         ("Component27", "Inherent Values", "Organisational Modes"),
         ("Component28", "Intrinsic Nature", "Organisational Modes"),
     ];
+    pub const SOURCE: &'static str = "Qualsystems Book";
 }

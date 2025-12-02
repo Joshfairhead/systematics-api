@@ -71,4 +71,5 @@ impl UndecadVocabulary {
         ("Needs Research54", "Position9", "Position11"),
         ("Needs Research55", "Position10", "Position11"),
     ];
+    pub const SOURCE: &'static str = "Elementary Systematics";
 }
