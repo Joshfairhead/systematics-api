@@ -1,0 +1,53 @@
+pub struct EnneadVocabulary;
+
+impl EnneadVocabulary {
+    pub const TERM_CHARACTERS: [&'static str; 9] = [
+        "Position1",
+        "Position2",
+        "Position3",
+        "Position4",
+        "Position5",
+        "Position6",
+        "Position7",
+        "Position8",
+        "Position9"
+    ];
+    pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 36] = [
+        ("Needs Research1", "Position1", "Position2"),
+        ("Needs Research2", "Position1", "Position3"),
+        ("Needs Research3", "Position1", "Position4"),
+        ("Needs Research4", "Position1", "Position5"),
+        ("Needs Research5", "Position1", "Position6"),
+        ("Needs Research6", "Position1", "Position7"),
+        ("Needs Research7", "Position1", "Position8"),
+        ("Needs Research8", "Position1", "Position9"),
+        ("Needs Research9", "Position2", "Position3"),
+        ("Needs Research10", "Position2", "Position4"),
+        ("Needs Research11", "Position2", "Position5"),
+        ("Needs Research12", "Position2", "Position6"),
+        ("Needs Research13", "Position2", "Position7"),
+        ("Needs Research14", "Position2", "Position8"),
+        ("Needs Research15", "Position2", "Position9"),
+        ("Needs Research16", "Position3", "Position4"),
+        ("Needs Research17", "Position3", "Position5"),
+        ("Needs Research18", "Position3", "Position6"),
+        ("Needs Research19", "Position3", "Position7"),
+        ("Needs Research20", "Position3", "Position8"),
+        ("Needs Research21", "Position3", "Position9"),
+        ("Needs Research22", "Position4", "Position5"),
+        ("Needs Research23", "Position4", "Position6"),
+        ("Needs Research24", "Position4", "Position7"),
+        ("Needs Research25", "Position4", "Position8"),
+        ("Needs Research26", "Position4", "Position9"),
+        ("Needs Research27", "Position5", "Position6"),
+        ("Needs Research28", "Position5", "Position7"),
+        ("Needs Research29", "Position5", "Position8"),
+        ("Needs Research30", "Position5", "Position9"),
+        ("Needs Research31", "Position6", "Position7"),
+        ("Needs Research32", "Position6", "Position8"),
+        ("Needs Research33", "Position6", "Position9"),
+        ("Needs Research34", "Position7", "Position8"),
+        ("Needs Research35", "Position7", "Position9"),
+        ("Needs Research36", "Position8", "Position9"),
+    ];
+}
