@@ -1,10 +1,10 @@
-use crate::core::state_manager::Index;
+use crate::core::topology::{Node, Edge};
 
 pub struct K5Topology;
 
 impl K5Topology {
-    pub const INDEX: [Index; 5] = [0, 1, 2, 3, 4];
-    pub const INDICES: [(Index, Index); 10] = [
+    pub const NODES: [Node; 5] = [0, 1, 2, 3, 4];
+    pub const EDGES: [Edge; 10] = [
         (0, 1), // Purpose-Higher Potential
         (1, 2), // Higher Potential-Quintessence
         (2, 3), // Quintessence-Lower Potential

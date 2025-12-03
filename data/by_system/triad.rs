@@ -1,4 +1,5 @@
-use crate::core::state_manager::{Coordinates, Index};
+use crate::core::topology::{Node, Edge};
+use crate::core::geometry::Coordinates;
 
 pub struct TriadSystem;
 
@@ -19,8 +20,8 @@ impl TriadSystem {
     ];
 
     // Topology
-    pub const INDEX: [Index; 3] = [0, 1, 2];
-    pub const INDICES: [(Index, Index); 3] = [
+    pub const NODES: [Node; 3] = [0, 1, 2];
+    pub const EDGES: [Edge; 3] = [
         (0, 1),  // Will-Function (vertical left)
         (1, 2),  // Function-Being (bottom right)
         (2, 0),  // Being-Will (top right)

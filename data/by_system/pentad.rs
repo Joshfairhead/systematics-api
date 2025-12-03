@@ -1,4 +1,5 @@
-use crate::core::state_manager::{Coordinates, Index};
+use crate::core::topology::{Node, Edge};
+use crate::core::geometry::Coordinates;
 
 pub struct PentadSystem;
 
@@ -26,8 +27,8 @@ impl PentadSystem {
     ];
 
     // Topology (from by_topology/k5.rs)
-    pub const INDEX: [Index; 5] = [0, 1, 2, 3, 4];
-    pub const INDICES: [(Index, Index); 10] = [
+    pub const NODES: [Node; 5] = [0, 1, 2, 3, 4];
+    pub const EDGES: [Edge; 10] = [
         (0, 1), // Purpose-Higher Potential
         (1, 2), // Higher Potential-Quintessence
         (2, 3), // Quintessence-Lower Potential

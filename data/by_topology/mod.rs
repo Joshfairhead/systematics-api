@@ -11,9 +11,6 @@ pub mod k10;
 pub mod k11;
 pub mod k12;
 
-use crate::core::state_manager::{Index, IndexPair};
-use crate::core::traits::TopologyData;
-
 // Re-export all topology structs
 pub use k1::K1Topology;
 pub use k2::K2Topology;
@@ -27,64 +24,3 @@ pub use k9::K9Topology;
 pub use k10::K10Topology;
 pub use k11::K11Topology;
 pub use k12::K12Topology;
-
-// Implement TopologyData for all topology structs
-impl TopologyData for K1Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K2Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K3Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K4Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K5Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K6Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K7Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K8Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K9Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K10Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K11Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}
-
-impl TopologyData for K12Topology {
-    fn indexes(&self) -> &[Index] { &Self::INDEXES }
-    fn edges(&self) -> &[IndexPair] { &Self::EDGES }
-}

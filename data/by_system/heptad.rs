@@ -1,4 +1,5 @@
-use crate::core::state_manager::{Coordinates, Index};
+use crate::core::topology::{Node, Edge};
+use crate::core::geometry::Coordinates;
 
 pub struct HeptadSystem;
 
@@ -37,8 +38,8 @@ impl HeptadSystem {
     ];
 
     // Topology (from by_topology/k7.rs)
-    pub const INDEX: [Index; 7] = [0, 1, 2, 3, 4, 5, 6];
-    pub const INDICES: [(Index, Index); 21] = [
+    pub const NODES: [Node; 7] = [0, 1, 2, 3, 4, 5, 6];
+    pub const EDGES: [Edge; 21] = [
         (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6),
         (1, 2), (1, 3), (1, 4), (1, 5), (1, 6),
         (2, 3), (2, 4), (2, 5), (2, 6),

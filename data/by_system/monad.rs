@@ -1,4 +1,5 @@
-use crate::core::state_manager::{Coordinates, Index};
+use crate::core::topology::{Node, Edge};
+use crate::core::geometry::Coordinates;
 
 pub struct MonadSystem;
 
@@ -15,8 +16,8 @@ impl MonadSystem {
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 0] = [];
 
     // Topology
-    pub const INDEX: [Index; 1] = [0];
-    pub const INDICES: [(Index, Index); 0] = [];
+    pub const NODES: [Node; 1] = [0];
+    pub const EDGES: [Edge; 0] = [];
 
     // Geometry
     pub const POINTS: [Coordinates; 1] = [

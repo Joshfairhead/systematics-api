@@ -1,10 +1,10 @@
-use crate::core::state_manager::Index;
+use crate::core::topology::{Node, Edge};
 
 pub struct K2Topology;
 
 impl K2Topology {
-    pub const INDEX: [Index; 2] = [0, 1];
-    pub const INDICES: [(Index, Index); 1] = [
+    pub const NODES: [Node; 2] = [0, 1];
+    pub const EDGES: [Edge; 1] = [
         (0, 1), // Single edge
     ];
 }

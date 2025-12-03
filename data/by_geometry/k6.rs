@@ -1,4 +1,4 @@
-use crate::core::state_manager::Coordinates;
+use crate::core::geometry::Coordinates;
 
 pub struct K6Geometry;
 
