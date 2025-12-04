@@ -13,18 +13,18 @@ impl DodecadSystem {
 
     // Vocabulary (from by_vocabulary/k12.rs)
     pub const TERM_CHARACTERS: [&'static str; 12] = [
-        "Autocracy",
-        "Creativity",
-        "Individuality",
-        "Structure",
         "Wholeness",
+        "Polarity",
         "Relatedness",
         "Subsistence",
-        "Polarity",
         "Potentiality",
         "Repetition",
+        "Structure",
+        "Individuality",
         "Pattern",
-        "Domination"
+        "Creativity",
+        "Domination",
+        "Autocracy"
     ];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 66] = [
         ("Needs Research1", "Autocracy", "Domination"),
@@ -113,18 +113,18 @@ impl DodecadSystem {
 
     // Geometry (from by_geometry/k12.rs)
     pub const POINTS: [Coordinates; 12] = [
-        Coordinates { x: 0.0, y: 1.0, z: None },
-        Coordinates { x: 0.5, y: 0.86602540378, z: None },
-        Coordinates { x: 0.86602540378, y: 0.5, z: None },
-        Coordinates { x: 1.0, y: 0.0, z: None },
-        Coordinates { x: 0.86602540378, y: -0.5, z: None },
-        Coordinates { x: 0.5, y: -0.86602540378, z: None },
-        Coordinates { x: 0.0, y: -1.0, z: None },
-        Coordinates { x: -0.5, y: -0.86602540378, z: None },
-        Coordinates { x: -0.86602540378, y: -0.5, z: None },
-        Coordinates { x: -1.0, y: 0.0, z: None },
-        Coordinates { x: -0.86602540378, y: 0.5, z: None },
-        Coordinates { x: -0.5, y: 0.86602540378, z: None },
+        Coordinates { x: 0.86602540378, y: -0.5, z: None },          // 0: Wholeness (from old 4)
+        Coordinates { x: -0.5, y: -0.86602540378, z: None },          // 1: Polarity (from old 7)
+        Coordinates { x: 0.5, y: -0.86602540378, z: None },           // 2: Relatedness (from old 5)
+        Coordinates { x: 0.0, y: -1.0, z: None },                     // 3: Subsistence (from old 6)
+        Coordinates { x: -0.86602540378, y: -0.5, z: None },          // 4: Potentiality (from old 8)
+        Coordinates { x: -1.0, y: 0.0, z: None },                     // 5: Repetition (from old 9)
+        Coordinates { x: 1.0, y: 0.0, z: None },                      // 6: Structure (from old 3)
+        Coordinates { x: 0.86602540378, y: 0.5, z: None },            // 7: Individuality (from old 2)
+        Coordinates { x: -0.86602540378, y: 0.5, z: None },           // 8: Pattern (from old 10)
+        Coordinates { x: 0.5, y: 0.86602540378, z: None },            // 9: Creativity (from old 1)
+        Coordinates { x: -0.5, y: 0.86602540378, z: None },           // 10: Domination (from old 11)
+        Coordinates { x: 0.0, y: 1.0, z: None },                      // 11: Autocracy (from old 0)
     ];
     pub const LINES: [(Coordinates, Coordinates); 66] = [
         (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.5, y: 0.86602540378, z: None }),

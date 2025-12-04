@@ -1,0 +1,9 @@
+/Users/joshfairhead/dev/systematics-api/.conductor/bordeaux/target/debug/deps/libasync_graphql_axum-bef1036ea6bbbde5.rmeta: /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/lib.rs /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/extract.rs /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/query.rs /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/response.rs /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/subscription.rs
+
+/Users/joshfairhead/dev/systematics-api/.conductor/bordeaux/target/debug/deps/async_graphql_axum-bef1036ea6bbbde5.d: /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/lib.rs /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/extract.rs /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/query.rs /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/response.rs /Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/subscription.rs
+
+/Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/lib.rs:
+/Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/extract.rs:
+/Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/query.rs:
+/Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/response.rs:
+/Users/joshfairhead/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/async-graphql-axum-7.0.17/src/subscription.rs:
