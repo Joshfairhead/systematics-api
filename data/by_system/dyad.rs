@@ -12,9 +12,10 @@ impl DyadSystem {
     pub const SOURCE: &'static str = "Elementary Systematics";
 
     // Vocabulary
-    pub const TERM_CHARACTERS: [&'static str; 2] = ["Essence", "Existence"];
+    // Semantic ordering: Existence (1), Essence (2) when displayed with one-based indexing
+    pub const TERM_CHARACTERS: [&'static str; 2] = ["Existence", "Essence"];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 1] = [
-        ("Force1", "Essence", "Existence"),
+        ("Force1", "Existence", "Essence"),
     ];
 
     // Topology
