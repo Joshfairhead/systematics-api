@@ -15,7 +15,7 @@ impl DyadSystem {
     // Semantic ordering: Essence (1), Existence (2) when displayed with one-based indexing
     pub const TERM_CHARACTERS: [&'static str; 2] = ["Essence", "Existence"];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 1] = [
-        ("Force1", "Existence", "Essence"),
+        ("Force1", "Essence", "Existence"),
     ];
 
     // Topology
