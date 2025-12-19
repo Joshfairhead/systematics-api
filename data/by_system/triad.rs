@@ -12,8 +12,8 @@ impl TriadSystem {
     pub const SOURCE: &'static str = "Elementary Systematics";
 
     // Vocabulary
-    // Semantic ordering: Function (1), Being (2), Will (3) when displayed with one-based indexing
-    pub const TERM_CHARACTERS: [&'static str; 3] = ["Function", "Being", "Will"];
+    // Semantic ordering: Will (1), Function (2), Being (3) when displayed with one-based indexing
+    pub const TERM_CHARACTERS: [&'static str; 3] = ["Will", "Function", "Being"];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 3] = [
         ("Act1", "Function", "Being"),
         ("Act2", "Being", "Will"),
@@ -31,9 +31,9 @@ impl TriadSystem {
     // Geometry
     // Coordinates reordered to match semantic vocabulary ordering
     pub const POINTS: [Coordinates; 3] = [
-        Coordinates { x: 0.0, y: -1.0, z: None },  // 0: Function (bottom left)
-        Coordinates { x: 1.0, y: 0.0, z: None },   // 1: Being (right, midpoint vertically)
-        Coordinates { x: 0.0, y: 1.0, z: None },   // 2: Will (top left)
+        Coordinates { x: 0.0, y: 1.0, z: None },   // 0: Will (top left)
+        Coordinates { x: 0.0, y: -1.0, z: None },  // 1: Function (bottom left)
+        Coordinates { x: 1.0, y: 0.0, z: None },   // 2: Being (right, midpoint vertically)
     ];
     pub const LINES: [(Coordinates, Coordinates); 3] = [
         (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: 1.0, y: 0.0, z: None }),  // Function-Being (edge 0-1)

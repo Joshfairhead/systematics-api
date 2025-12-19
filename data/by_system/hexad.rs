@@ -12,8 +12,8 @@ impl HexadSystem {
     pub const SOURCE: &'static str = "Elementary Systematics";
 
     // Vocabulary (from by_vocabulary/k6.rs)
-    // Semantic ordering: Priorities (1), Facts (2), Criteria (3), Options (4), Values (5), Resources (6) when displayed with one-based indexing
-    pub const TERM_CHARACTERS: [&'static str; 6] = ["Priorities", "Facts", "Criteria", "Options", "Values", "Resources"];
+    // Semantic ordering: Priorities (1/Red), Criteria (2/Blue), Values (3/Yellow), Resources (4/Green), Options (5/Purple), Facts (6/Orange) when displayed with one-based indexing
+    pub const TERM_CHARACTERS: [&'static str; 6] = ["Priorities", "Criteria", "Values", "Resources", "Options", "Facts"];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 15] = [
         ("Step15", "Priorities", "Facts"),
         ("Step14", "Priorities", "Criteria"),
@@ -46,11 +46,11 @@ impl HexadSystem {
     // Coordinates reordered to match semantic vocabulary ordering (reversed from original)
     pub const POINTS: [Coordinates; 6] = [
         Coordinates { x: -0.866, y: -0.5, z: None },        // index 0: Priorities (lower left)
-        Coordinates { x: 0.0, y: -1.0, z: None },           // index 1: Facts (bottom)
-        Coordinates { x: 0.866, y: -0.5, z: None },         // index 2: Criteria (lower right)
-        Coordinates { x: 0.866, y: 0.5, z: None },          // index 3: Options (upper right)
-        Coordinates { x: 0.0, y: 1.0, z: None },            // index 4: Values (top)
-        Coordinates { x: -0.866, y: 0.5, z: None },         // index 5: Resources (upper left)
+        Coordinates { x: 0.866, y: -0.5, z: None },         // index 1: Criteria (lower right)
+        Coordinates { x: 0.0, y: 1.0, z: None },            // index 2: Values (top)
+        Coordinates { x: -0.866, y: 0.5, z: None },         // index 3: Resources (upper left)
+        Coordinates { x: 0.866, y: 0.5, z: None },          // index 4: Options (upper right)
+        Coordinates { x: 0.0, y: -1.0, z: None },           // index 5: Facts (bottom)
     ];
     pub const LINES: [(Coordinates, Coordinates); 15] = [
         // Edge 0-1: Priorities to Facts

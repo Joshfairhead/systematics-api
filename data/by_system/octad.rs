@@ -12,15 +12,16 @@ impl OctadSystem {
     pub const SOURCE: &'static str = "Qualsystems Book";
 
     // Vocabulary (from by_vocabulary/k8.rs)
+    // Semantic ordering: Inherent Values (1/Red), Critical Functions (2/Blue), Organisational Modes (3/Yellow), Necessary Resourcing (4/Green), Intrinsic Nature (5/Purple), Smallest Holon (6/Orange), Integrative Totality (7/Light Blue), Supportive Platform (8/Brown)
     pub const TERM_CHARACTERS: [&'static str; 8] = [
-        "Smallest Significant Holon",
-        "Critical Functions",
-        "Supportive Platform",
-        "Necessary Resourcing",
-        "Integrative Totality",
         "Inherent Values",
+        "Critical Functions",
+        "Organisational Modes",
+        "Necessary Resourcing",
         "Intrinsic Nature",
-        "Organisational Modes"
+        "Smallest Significant Holon",
+        "Integrative Totality",
+        "Supportive Platform"
     ];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 28] = [
         ("Component1", "Smallest Significant Holon", "Critical Functions"),
@@ -67,14 +68,14 @@ impl OctadSystem {
 
     // Geometry (from by_geometry/k8.rs)
     pub const POINTS: [Coordinates; 8] = [
-        Coordinates { x: 1.0, y: 0.0, z: None },                        // 0: Smallest Significant Holon (right, middle)
+        Coordinates { x: -0.70710678118, y: 0.70710678118, z: None },   // 0: Inherent Values (upper left)
         Coordinates { x: 0.70710678118, y: -0.70710678118, z: None },   // 1: Critical Functions (lower right)
-        Coordinates { x: 0.0, y: -1.0, z: None },                       // 2: Supportive Platform (bottom)
+        Coordinates { x: 0.70710678118, y: 0.70710678118, z: None },    // 2: Organisational Modes (upper right)
         Coordinates { x: -0.70710678118, y: -0.70710678118, z: None },  // 3: Necessary Resourcing (lower left)
-        Coordinates { x: -1.0, y: 0.0, z: None },                       // 4: Integrative Totality (left, middle)
-        Coordinates { x: -0.70710678118, y: 0.70710678118, z: None },   // 5: Inherent Values (upper left)
-        Coordinates { x: 0.0, y: 1.0, z: None },                        // 6: Intrinsic Nature (top)
-        Coordinates { x: 0.70710678118, y: 0.70710678118, z: None },    // 7: Organisational Modes (upper right)
+        Coordinates { x: 0.0, y: 1.0, z: None },                        // 4: Intrinsic Nature (top)
+        Coordinates { x: 1.0, y: 0.0, z: None },                        // 5: Smallest Significant Holon (right, middle)
+        Coordinates { x: -1.0, y: 0.0, z: None },                       // 6: Integrative Totality (left, middle)
+        Coordinates { x: 0.0, y: -1.0, z: None },                       // 7: Supportive Platform (bottom)
     ];
     pub const LINES: [(Coordinates, Coordinates); 28] = [
         (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: 0.70710678118, y: -0.70710678118, z: None }),
