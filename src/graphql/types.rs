@@ -1,6 +1,7 @@
 use async_graphql::*;
 use crate::core::topology::Node;
 use crate::core::geometry::Coordinates as CoreCoordinates;
+use crate::core::hyparchic_registry::{HyparchicRegistry, Index as HyparchicIndex};
 
 /// A coordinate in 2D or 3D space
 #[derive(Clone, Copy, Debug)]
@@ -167,6 +168,15 @@ impl System {
         &self.source
     }
 
+    /// Color associated with this system based on its order
+    async fn color(&self) -> String {
+        let order = self.nodes.len();
+        let hyparchic_index = HyparchicIndex::new(order as u8)
+            .unwrap_or_else(|_| HyparchicIndex::new(1).unwrap());
+        let color = HyparchicRegistry::get_color(hyparchic_index);
+        color.as_str().to_string()
+    }
+
     async fn term_characters(&self) -> Vec<Term> {
         self.term_characters
             .iter()
@@ -174,7 +184,7 @@ impl System {
             .map(|(i, name)| Term {
                 name: name.clone(),
                 system_name: self.name.clone(),
-                node: i,
+                index: i,
                 coordinate: self.points.get(i).copied(),
             })
             .collect()
@@ -225,7 +235,7 @@ impl System {
 pub struct Term {
     pub name: String,
     pub system_name: String,
-    pub node: usize,
+    pub index: usize,  // Zero-based internally, one-based in API
     pub coordinate: Option<Coordinate>,
 }
 
@@ -246,9 +256,17 @@ impl Term {
         &self.system_name
     }
 
-    /// Node number with one-based indexing
-    async fn node(&self) -> i32 {
-        (self.node + 1) as i32
+    /// Index with one-based indexing
+    async fn index(&self) -> i32 {
+        (self.index + 1) as i32
+    }
+
+    /// Color associated with this index position
+    async fn color(&self) -> String {
+        let hyparchic_index = HyparchicIndex::from_zero_based(self.index)
+            .unwrap_or_else(|_| HyparchicIndex::new(1).unwrap());
+        let color = HyparchicRegistry::get_color(hyparchic_index);
+        color.as_str().to_string()
     }
 
     async fn coordinate(&self) -> Option<Coordinate> {
@@ -309,7 +327,7 @@ impl QueryRoot {
                 .map(|(i, name_str)| Term {
                     name: name_str.clone(),
                     system_name: s.name.clone(),
-                    node: i,
+                    index: i,
                     coordinate: s.points.get(i).copied(),
                 })
                 .collect()
@@ -335,7 +353,7 @@ impl QueryRoot {
                     return Some(Term {
                         name: term_name.clone(),
                         system_name: system.name.clone(),
-                        node: i,
+                        index: i,
                         coordinate: system.points.get(i).copied(),
                     });
                 }
@@ -353,7 +371,7 @@ impl QueryRoot {
                 .map(|(i, name_str)| Term {
                     name: name_str.clone(),
                     system_name: s.name.clone(),
-                    node: i,
+                    index: i,
                     coordinate: s.points.get(i).copied(),
                 })
                 .collect()

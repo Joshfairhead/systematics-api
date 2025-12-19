@@ -12,9 +12,9 @@ impl HeptadSystem {
     pub const SOURCE: &'static str = "Elementary Systematics";
 
     // Vocabulary (from by_vocabulary/k7.rs)
-    // Semantic ordering: Research (1), Design (2), Synthesis (3), Application (4), Delivery (5), Value (6), Insight (7) when displayed with one-based indexing
-    // Rotated clockwise by one position from original ordering
-    pub const TERM_CHARACTERS: [&'static str; 7] = ["Research", "Design", "Synthesis", "Application", "Delivery", "Value", "Insight"];
+    // Semantic ordering: Insight (1/Red), Application (2/Blue), Design (3/Yellow), Research (4/Green), Synthesis (5/Purple), Delivery (6/Orange), Value (7/Light Blue) when displayed with one-based indexing
+    // Clockwise from 12 o'clock (top center)
+    pub const TERM_CHARACTERS: [&'static str; 7] = ["Insight", "Application", "Design", "Research", "Synthesis", "Delivery", "Value"];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 21] = [
         ("Needs Research", "Research", "Design"),
         ("Needs Research", "Research", "Synthesis"),
@@ -51,15 +51,15 @@ impl HeptadSystem {
     ];
 
     // Geometry (from by_geometry/k7.rs)
-    // Coordinates rotated clockwise by one position to match semantic vocabulary ordering
+    // Coordinates rotated clockwise from 12 o'clock to match semantic vocabulary ordering
     pub const POINTS: [Coordinates; 7] = [
-        Coordinates { x: 0.781831, y: 0.623489, z: None },   // 0: Research (was index 1)
-        Coordinates { x: 0.974370, y: -0.222521, z: None },  // 1: Design (was index 2)
-        Coordinates { x: 0.433884, y: -0.900969, z: None },  // 2: Synthesis (was index 3)
-        Coordinates { x: -0.433884, y: -0.900969, z: None }, // 3: Application (was index 4)
-        Coordinates { x: -0.974370, y: -0.222521, z: None }, // 4: Delivery (was index 5)
-        Coordinates { x: -0.781831, y: 0.623489, z: None },  // 5: Value (was index 6)
-        Coordinates { x: 0.0, y: 1.0, z: None },             // 6: Insight (was index 0, top center)
+        Coordinates { x: 0.0, y: 1.0, z: None },             // 0: Insight (top center, 12 o'clock)
+        Coordinates { x: -0.433884, y: -0.900969, z: None }, // 1: Application
+        Coordinates { x: 0.974370, y: -0.222521, z: None },  // 2: Design
+        Coordinates { x: 0.781831, y: 0.623489, z: None },   // 3: Research
+        Coordinates { x: 0.433884, y: -0.900969, z: None },  // 4: Synthesis
+        Coordinates { x: -0.974370, y: -0.222521, z: None }, // 5: Delivery
+        Coordinates { x: -0.781831, y: 0.623489, z: None },  // 6: Value
     ];
     pub const LINES: [(Coordinates, Coordinates); 21] = [
         // Edge 0-1: Research-Design

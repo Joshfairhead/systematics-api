@@ -12,8 +12,8 @@ impl PentadSystem {
     pub const SOURCE: &'static str = "Elementary Systematics";
 
     // Vocabulary (from by_vocabulary/k5.rs)
-    // Semantic ordering: Source (1), Lower Potential (2), Quintessence (3), Higher Potential (4), Purpose (5) when displayed with one-based indexing
-    pub const TERM_CHARACTERS: [&'static str; 5] = ["Source", "Lower Potential", "Quintessence", "Higher Potential", "Purpose"];
+    // Semantic ordering: Quintessence (1), Source (2), Higher Potential (3), Lower Potential (4), Purpose (5) when displayed with one-based indexing
+    pub const TERM_CHARACTERS: [&'static str; 5] = ["Quintessence", "Source", "Higher Potential", "Lower Potential", "Purpose"];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 10] = [
         ("Input", "Source", "Lower Potential"),
         ("Quantitative Match", "Source", "Quintessence"),
@@ -45,10 +45,10 @@ impl PentadSystem {
     // Geometry (from by_geometry/k5.rs)
     // Coordinates reordered to match semantic vocabulary ordering (reversed from original)
     pub const POINTS: [Coordinates; 5] = [
-        Coordinates { x: 1.0, y: -0.75, z: None },   // 0: Source (right, bottom)
-        Coordinates { x: 0.0, y: -0.5, z: None },    // 1: Lower Potential (center, lower)
-        Coordinates { x: -0.75, y: 0.0, z: None },   // 2: Quintessence (left-center, middle)
-        Coordinates { x: 0.0, y: 0.5, z: None },     // 3: Higher Potential (center, upper)
+        Coordinates { x: -0.75, y: 0.0, z: None },   // 0: Quintessence (left-center, middle)
+        Coordinates { x: 1.0, y: -0.75, z: None },   // 1: Source (right, bottom)
+        Coordinates { x: 0.0, y: 0.5, z: None },     // 2: Higher Potential (center, upper)
+        Coordinates { x: 0.0, y: -0.5, z: None },    // 3: Lower Potential (center, lower)
         Coordinates { x: 1.0, y: 0.75, z: None },    // 4: Purpose (right, top)
     ];
     pub const LINES: [(Coordinates, Coordinates); 10] = [

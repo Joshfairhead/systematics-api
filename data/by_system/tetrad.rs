@@ -12,8 +12,8 @@ impl TetradSystem {
     pub const SOURCE: &'static str = "Elementary Systematics";
 
     // Vocabulary
-    // Semantic ordering: Ground (1), Instrumental (2), Directive (3), Ideal (4) when displayed with one-based indexing
-    pub const TERM_CHARACTERS: [&'static str; 4] = ["Ground", "Instrumental", "Directive", "Ideal"];
+    // Semantic ordering: Ideal (1), Ground (2), Directive (3), Instrumental (4) when displayed with one-based indexing
+    pub const TERM_CHARACTERS: [&'static str; 4] = ["Ideal", "Ground", "Directive", "Instrumental"];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 6] = [
         ("Technical Power", "Ground", "Instrumental"),
         ("Material Mastery", "Ground", "Directive"),
@@ -37,10 +37,10 @@ impl TetradSystem {
     // Geometry
     // Coordinates reordered to match semantic vocabulary ordering (reversed from original)
     pub const POINTS: [Coordinates; 4] = [
-        Coordinates { x: 0.0, y: -1.0, z: None },  // 0: ground (bottom)
-        Coordinates { x: -1.0, y: 0.0, z: None },  // 1: instrumental (left)
+        Coordinates { x: 0.0, y: 1.0, z: None },   // 0: ideal (top)
+        Coordinates { x: 0.0, y: -1.0, z: None },  // 1: ground (bottom)
         Coordinates { x: 1.0, y: 0.0, z: None },   // 2: directive (right)
-        Coordinates { x: 0.0, y: 1.0, z: None },   // 3: ideal (top)
+        Coordinates { x: -1.0, y: 0.0, z: None },  // 3: instrumental (left)
     ];
     pub const LINES: [(Coordinates, Coordinates); 6] = [
         (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),  // ground-instrumental (edge 0-1)
