@@ -23,6 +23,10 @@ impl OctadSystem {
         "Integrative Totality",
         "Supportive Platform"
     ];
+
+    // Index mapping: sequential (position → same index)
+    pub const INDEX_MAPPING: [u8; 8] = [1, 2, 3, 4, 5, 6, 7, 8];
+
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 28] = [
         ("Component1", "Smallest Significant Holon", "Critical Functions"),
         ("Component2", "Smallest Significant Holon", "Supportive Platform"),

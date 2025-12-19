@@ -97,6 +97,24 @@ impl Color {
             Color::BrightOrange => "Bright Orange/Gold",
         }
     }
+
+    /// Get the color as a hex code
+    pub fn hex_code(&self) -> &'static str {
+        match self {
+            Color::Red => "#FF0000",
+            Color::Blue => "#0000FF",
+            Color::Yellow => "#FFFF00",
+            Color::Green => "#00FF00",
+            Color::Purple => "#800080",
+            Color::Orange => "#FFA500",
+            Color::LightBlue => "#87CEEB",
+            Color::Brown => "#8B4513",
+            Color::Pink => "#FF10F0", // Neon/highlighter pink
+            Color::White => "#FFFFFF",
+            Color::GreySilver => "#C0C0C0",
+            Color::BrightOrange => "#FFD700", // Gold
+        }
+    }
 }
 
 impl fmt::Display for Color {

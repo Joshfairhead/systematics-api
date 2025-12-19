@@ -261,12 +261,24 @@ impl Term {
         (self.index + 1) as i32
     }
 
-    /// Color associated with this index position
+    /// Color name associated with this index position (via INDEX_MAPPING)
     async fn color(&self) -> String {
-        let hyparchic_index = HyparchicIndex::from_zero_based(self.index)
+        // Get the mapped index from the system's INDEX_MAPPING
+        let mapped_index = Term::get_mapped_index_for_system(&self.system_name, self.index);
+        let hyparchic_index = HyparchicIndex::new(mapped_index)
             .unwrap_or_else(|_| HyparchicIndex::new(1).unwrap());
         let color = HyparchicRegistry::get_color(hyparchic_index);
         color.as_str().to_string()
+    }
+
+    /// Hex color code associated with this index position (via INDEX_MAPPING)
+    async fn hex_color(&self) -> String {
+        // Get the mapped index from the system's INDEX_MAPPING
+        let mapped_index = Term::get_mapped_index_for_system(&self.system_name, self.index);
+        let hyparchic_index = HyparchicIndex::new(mapped_index)
+            .unwrap_or_else(|_| HyparchicIndex::new(1).unwrap());
+        let color = HyparchicRegistry::get_color(hyparchic_index);
+        color.hex_code().to_string()
     }
 
     async fn coordinate(&self) -> Option<Coordinate> {
@@ -276,6 +288,40 @@ impl Term {
     async fn system(&self, ctx: &Context<'_>) -> Result<Option<System>> {
         let query_root = ctx.data::<QueryRoot>()?;
         Ok(query_root.get_system(&self.system_name))
+    }
+}
+
+impl Term {
+    /// Get the mapped hyparchic index for a given system and position
+    fn get_mapped_index_for_system(system_name: &str, zero_based_position: usize) -> u8 {
+        use crate::data::by_system::monad::MonadSystem;
+        use crate::data::by_system::dyad::DyadSystem;
+        use crate::data::by_system::triad::TriadSystem;
+        use crate::data::by_system::tetrad::TetradSystem;
+        use crate::data::by_system::pentad::PentadSystem;
+        use crate::data::by_system::hexad::HexadSystem;
+        use crate::data::by_system::heptad::HeptadSystem;
+        use crate::data::by_system::octad::OctadSystem;
+        use crate::data::by_system::ennead::EnneadSystem;
+        use crate::data::by_system::decad::DecadSystem;
+        use crate::data::by_system::undecad::UndecadSystem;
+        use crate::data::by_system::dodecad::DodecadSystem;
+
+        match system_name.to_lowercase().as_str() {
+            "monad" => MonadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "dyad" => DyadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "triad" => TriadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "tetrad" => TetradSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "pentad" => PentadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "hexad" => HexadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "heptad" => HeptadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "octad" => OctadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "ennead" => EnneadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "decad" => DecadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "undecad" => UndecadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            "dodecad" => DodecadSystem::INDEX_MAPPING.get(zero_based_position).copied().unwrap_or(1),
+            _ => (zero_based_position + 1) as u8, // Fallback to sequential
+        }
     }
 }
 

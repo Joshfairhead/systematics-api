@@ -14,6 +14,10 @@ impl DyadSystem {
     // Vocabulary
     // Semantic ordering: Essence (1), Existence (2) when displayed with one-based indexing
     pub const TERM_CHARACTERS: [&'static str; 2] = ["Essence", "Existence"];
+
+    // Index mapping: sequential (position → same index)
+    pub const INDEX_MAPPING: [u8; 2] = [1, 2];
+
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 1] = [
         ("Force1", "Essence", "Existence"),
     ];

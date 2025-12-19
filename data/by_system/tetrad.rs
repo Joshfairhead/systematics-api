@@ -14,6 +14,10 @@ impl TetradSystem {
     // Vocabulary
     // Semantic ordering: Ideal (1), Ground (2), Directive (3), Instrumental (4) when displayed with one-based indexing
     pub const TERM_CHARACTERS: [&'static str; 4] = ["Ideal", "Ground", "Directive", "Instrumental"];
+
+    // Index mapping: sequential (position → same index)
+    pub const INDEX_MAPPING: [u8; 4] = [1, 2, 3, 4];
+
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 6] = [
         ("Technical Power", "Ground", "Instrumental"),
         ("Material Mastery", "Ground", "Directive"),

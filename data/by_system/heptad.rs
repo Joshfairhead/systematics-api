@@ -15,6 +15,10 @@ impl HeptadSystem {
     // Semantic ordering: Insight (1/Red), Application (2/Blue), Design (3/Yellow), Research (4/Green), Synthesis (5/Purple), Delivery (6/Orange), Value (7/Light Blue) when displayed with one-based indexing
     // Clockwise from 12 o'clock (top center)
     pub const TERM_CHARACTERS: [&'static str; 7] = ["Insight", "Application", "Design", "Research", "Synthesis", "Delivery", "Value"];
+
+    // Index mapping: sequential (position → same index)
+    pub const INDEX_MAPPING: [u8; 7] = [1, 2, 3, 4, 5, 6, 7];
+
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 21] = [
         ("Needs Research", "Research", "Design"),
         ("Needs Research", "Research", "Synthesis"),
