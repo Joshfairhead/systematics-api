@@ -29,8 +29,7 @@ impl DodecadSystem {
     ];
 
     // Index mapping: position → hyparchic index
-    // Maps original positions to color sequence (Autocracy clockwise from top)
-    // Position 0 (Wholeness) is at old position, Position 11 (Autocracy) is at top
+    // Each position gets the index corresponding to its displayed color (universal scheme)
     pub const INDEX_MAPPING: [u8; 12] = [
         2,  // Position 0 (Wholeness) → index 2 (blue)
         8,  // Position 1 (Polarity) → index 8 (brown)

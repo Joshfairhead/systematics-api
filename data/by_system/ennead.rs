@@ -25,7 +25,7 @@ impl EnneadSystem {
     ];
 
     // Index mapping: position → hyparchic index
-    // Rotated counter-clockwise by one position
+    // Each position gets the index corresponding to its displayed color (universal scheme)
     pub const INDEX_MAPPING: [u8; 9] = [
         3, // Position 1 → index 3 (yellow)
         6, // Position 2 → index 6 (orange)

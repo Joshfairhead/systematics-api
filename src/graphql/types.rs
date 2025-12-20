@@ -256,9 +256,10 @@ impl Term {
         &self.system_name
     }
 
-    /// Index with one-based indexing
+    /// Index from INDEX_MAPPING (universal color scheme)
     async fn index(&self) -> i32 {
-        (self.index + 1) as i32
+        let mapped_index = Term::get_mapped_index_for_system(&self.system_name, self.index);
+        mapped_index as i32
     }
 
     /// Color name associated with this index position (via INDEX_MAPPING)

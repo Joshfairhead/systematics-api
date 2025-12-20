@@ -29,6 +29,7 @@ impl UndecadSystem {
     ];
 
     // Index mapping: position → hyparchic index
+    // Each position gets the index corresponding to its displayed color (universal scheme)
     pub const INDEX_MAPPING: [u8; 11] = [
         11, // Position 1 → index 11 (grey/silver)
         3,  // Position 2 → index 3 (yellow)

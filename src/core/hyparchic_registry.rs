@@ -103,16 +103,16 @@ impl Color {
         match self {
             Color::Red => "#FF0000",
             Color::Blue => "#0000FF",
-            Color::Yellow => "#FFFF00",
-            Color::Green => "#00FF00",
-            Color::Purple => "#800080",
+            Color::Yellow => "#E6E600",         // Slightly darker yellow for better contrast
+            Color::Green => "#00CC00",          // Slightly darker green for better contrast
+            Color::Purple => "#9370DB",         // Medium purple (lighter for better text visibility)
             Color::Orange => "#FFA500",
-            Color::LightBlue => "#87CEEB",
-            Color::Brown => "#8B4513",
-            Color::Pink => "#FF10F0", // Neon/highlighter pink
+            Color::LightBlue => "#00BFFF",      // Deep Sky Blue (more vibrant)
+            Color::Brown => "#A0522D",          // Sienna (lighter brown for better text visibility)
+            Color::Pink => "#FF1493",           // Deep Pink (neon/vibrant)
             Color::White => "#FFFFFF",
-            Color::GreySilver => "#C0C0C0",
-            Color::BrightOrange => "#FFD700", // Gold
+            Color::GreySilver => "#C0C0C0",     // Silver
+            Color::BrightOrange => "#FFD700",   // Gold
         }
     }
 }
