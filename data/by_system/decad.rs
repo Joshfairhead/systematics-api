@@ -26,6 +26,21 @@ impl DecadSystem {
         "Position9",
         "Position10"
     ];
+
+    // Index mapping: position → hyparchic index
+    // Each position gets the index corresponding to its displayed color (universal scheme)
+    pub const INDEX_MAPPING: [u8; 10] = [
+        5,  // Position 1 → index 5 (purple)
+        3,  // Position 2 → index 3 (yellow)
+        6,  // Position 3 → index 6 (orange)
+        9,  // Position 4 → index 9 (pink)
+        2,  // Position 5 → index 2 (blue)
+        8,  // Position 6 → index 8 (brown)
+        4,  // Position 7 → index 4 (green)
+        10, // Position 8 → index 10 (white)
+        7,  // Position 9 → index 7 (light blue)
+        1,  // Position 10 → index 1 (red)
+    ];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 45] = [
         ("Needs Research1", "Position1", "Position2"),
         ("Needs Research2", "Position1", "Position3"),
@@ -89,63 +104,64 @@ impl DecadSystem {
     ];
 
     // Geometry (from by_geometry/k10.rs)
+    // Rotated 18 degrees counter-clockwise so purple and yellow nodes are horizontal at top
     pub const POINTS: [Coordinates; 10] = [
-        Coordinates { x: 0.0, y: 1.0, z: None },
-        Coordinates { x: 0.58778525229, y: 0.80901699437, z: None },
-        Coordinates { x: 0.95105651630, y: 0.30901699437, z: None },
-        Coordinates { x: 0.95105651630, y: -0.30901699437, z: None },
-        Coordinates { x: 0.58778525229, y: -0.80901699437, z: None },
-        Coordinates { x: 0.0, y: -1.0, z: None },
-        Coordinates { x: -0.58778525229, y: -0.80901699437, z: None },
-        Coordinates { x: -0.95105651630, y: -0.30901699437, z: None },
-        Coordinates { x: -0.95105651630, y: 0.30901699437, z: None },
-        Coordinates { x: -0.58778525229, y: 0.80901699437, z: None },
+        Coordinates { x: -0.30901699437, y: 0.95105651630, z: None },
+        Coordinates { x: 0.30901699437, y: 0.95105651630, z: None },
+        Coordinates { x: 0.80901699437, y: 0.58778525229, z: None },
+        Coordinates { x: 1.0, y: 0.0, z: None },
+        Coordinates { x: 0.80901699437, y: -0.58778525229, z: None },
+        Coordinates { x: 0.30901699437, y: -0.95105651630, z: None },
+        Coordinates { x: -0.30901699437, y: -0.95105651630, z: None },
+        Coordinates { x: -0.80901699437, y: -0.58778525229, z: None },
+        Coordinates { x: -1.0, y: 0.0, z: None },
+        Coordinates { x: -0.80901699437, y: 0.58778525229, z: None },
     ];
     pub const LINES: [(Coordinates, Coordinates); 45] = [
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }, Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }, Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }, Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }, Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }, Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }, Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: 0.80901699437, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }, Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }, Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }, Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }, Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }, Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: 0.30901699437, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }, Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }, Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }, Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }, Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: 0.95105651630, y: -0.30901699437, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }, Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }, Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }, Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: 0.58778525229, y: -0.80901699437, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }, Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }),
-        (Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }, Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: -0.58778525229, y: -0.80901699437, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }, Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }),
-        (Coordinates { x: -0.95105651630, y: -0.30901699437, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
-        (Coordinates { x: -0.95105651630, y: 0.30901699437, z: None }, Coordinates { x: -0.58778525229, y: 0.80901699437, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 1.0, y: 0.0, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
+        (Coordinates { x: -0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 1.0, y: 0.0, z: None }),
+        (Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
+        (Coordinates { x: 0.30901699437, y: 0.95105651630, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }, Coordinates { x: 1.0, y: 0.0, z: None }),
+        (Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }, Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }, Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }, Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }, Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
+        (Coordinates { x: 0.80901699437, y: 0.58778525229, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
+        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }, Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }, Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }, Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
+        (Coordinates { x: 0.80901699437, y: -0.58778525229, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }, Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }),
+        (Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }, Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
+        (Coordinates { x: 0.30901699437, y: -0.95105651630, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }, Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }),
+        (Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
+        (Coordinates { x: -0.30901699437, y: -0.95105651630, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
+        (Coordinates { x: -0.80901699437, y: -0.58778525229, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
+        (Coordinates { x: -1.0, y: 0.0, z: None }, Coordinates { x: -0.80901699437, y: 0.58778525229, z: None }),
     ];
 }

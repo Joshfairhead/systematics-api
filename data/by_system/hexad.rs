@@ -14,6 +14,10 @@ impl HexadSystem {
     // Vocabulary (from by_vocabulary/k6.rs)
     // Semantic ordering: Priorities (1/Red), Criteria (2/Blue), Values (3/Yellow), Resources (4/Green), Options (5/Purple), Facts (6/Orange) when displayed with one-based indexing
     pub const TERM_CHARACTERS: [&'static str; 6] = ["Priorities", "Criteria", "Values", "Resources", "Options", "Facts"];
+
+    // Index mapping: sequential (position → same index)
+    pub const INDEX_MAPPING: [u8; 6] = [1, 2, 3, 4, 5, 6];
+
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 15] = [
         ("Step15", "Priorities", "Facts"),
         ("Step14", "Priorities", "Criteria"),

@@ -12,6 +12,7 @@ impl DodecadSystem {
     pub const SOURCE: &'static str = "Elementary Systematics";
 
     // Vocabulary (from by_vocabulary/k12.rs)
+    // Original World Game ordering preserved
     pub const TERM_CHARACTERS: [&'static str; 12] = [
         "Wholeness",
         "Polarity",
@@ -26,18 +27,35 @@ impl DodecadSystem {
         "Domination",
         "Autocracy"
     ];
+
+    // Index mapping: position → hyparchic index
+    // Each position gets the index corresponding to its displayed color (universal scheme)
+    pub const INDEX_MAPPING: [u8; 12] = [
+        2,  // Position 0 (Wholeness) → index 2 (blue)
+        8,  // Position 1 (Polarity) → index 8 (brown)
+        10, // Position 2 (Relatedness) → index 10 (white)
+        7,  // Position 3 (Subsistence) → index 7 (light blue)
+        4,  // Position 4 (Potentiality) → index 4 (green)
+        11, // Position 5 (Repetition) → index 11 (grey/silver)
+        5,  // Position 6 (Structure) → index 5 (purple)
+        3,  // Position 7 (Individuality) → index 3 (yellow)
+        12, // Position 8 (Pattern) → index 12 (bright orange/gold)
+        6,  // Position 9 (Creativity) → index 6 (orange)
+        1,  // Position 10 (Domination) → index 1 (red)
+        9,  // Position 11 (Autocracy) → index 9 (pink)
+    ];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 66] = [
-        ("Needs Research1", "Autocracy", "Domination"),
-        ("Needs Research2", "Autocracy", "Creativity"),
-        ("Needs Research3", "Autocracy", "Pattern"),
-        ("Needs Research4", "Autocracy", "Individuality"),
-        ("Needs Research5", "Autocracy", "Structure"),
-        ("Needs Research6", "Autocracy", "Repetition"),
-        ("Needs Research7", "Autocracy", "Potentiality"),
-        ("Needs Research8", "Autocracy", "Subsistence"),
-        ("Needs Research9", "Autocracy", "Relatedness"),
-        ("Needs Research10", "Autocracy", "Polarity"),
-        ("Needs Research11", "Autocracy", "Wholeness"),
+        ("Needs Research1", "Wholeness", "Polarity"),
+        ("Needs Research2", "Wholeness", "Relatedness"),
+        ("Needs Research3", "Wholeness", "Subsistence"),
+        ("Needs Research4", "Wholeness", "Potentiality"),
+        ("Needs Research5", "Wholeness", "Repetition"),
+        ("Needs Research6", "Wholeness", "Structure"),
+        ("Needs Research7", "Wholeness", "Individuality"),
+        ("Needs Research8", "Wholeness", "Pattern"),
+        ("Needs Research9", "Wholeness", "Creativity"),
+        ("Needs Research10", "Wholeness", "Domination"),
+        ("Needs Research11", "Wholeness", "Autocracy"),
         ("Needs Research12", "Domination", "Creativity"),
         ("Needs Research13", "Domination", "Pattern"),
         ("Needs Research14", "Domination", "Individuality"),
