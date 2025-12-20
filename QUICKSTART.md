@@ -32,7 +32,7 @@ use systematics::core::{
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a Triad (3 elements) with Color content
-    let triad = System::generate(3, Color::Red)?;
+    let triad = System::generate(3, String::from("Item"))?;
 
     println!("Created {} with {} fibers",
         triad.fibers()[0].system_name(),
@@ -106,7 +106,7 @@ use systematics::core::{
 };
 
 // With Colors
-let triad = System::generate(3, Color::Red)?;
+let triad = System::generate(3, String::from("Item"))?;
 
 // With Aristotelian Causes
 let tetrad = System::generate(4, AristotelianCause::Formal)?;
@@ -147,7 +147,7 @@ use systematics::core::{
     universal_index::UniversalIndex,
 };
 
-let triad = System::generate(3, Color::Red)?;
+let triad = System::generate(3, String::from("Item"))?;
 
 // Check if two fibers are connected
 let idx1 = UniversalIndex::new(1)?;
@@ -223,7 +223,7 @@ All construction methods return `Result<System<T>, SystemError>`:
 ```rust
 use systematics::core::system::{System, SystemError};
 
-match System::generate(3, Color::Red) {
+match System::generate(3, String::from("Item")) {
     Ok(system) => println!("Success! Created {}", system.order()),
     Err(SystemError::InvalidOrder(msg)) => println!("Invalid order: {}", msg),
     Err(SystemError::InvalidIndices(msg)) => println!("Invalid indices: {}", msg),
@@ -236,7 +236,7 @@ match System::generate(3, Color::Red) {
 ### Pattern 1: Generate, Modify, Reassemble
 ```rust
 // Generate
-let original = System::generate(3, Color::Red)?;
+let original = System::generate(3, String::from("Item"))?;
 
 // Extract and modify fibers
 let mut fibers: Vec<_> = original.fibers().iter().cloned().collect();
@@ -261,7 +261,7 @@ match System::try_assemble(external_fibers) {
 ### Pattern 3: Mixed Content Types
 ```rust
 // Each System can have its own content type
-let triad_colors = System::generate(3, Color::Red)?;
+let triad_colors = System::generate(3, String::from("Item"))?;
 let tetrad_causes = System::generate(4, AristotelianCause::Formal)?;
 let pentad_strings = System::generate(5, String::from("Item"))?;
 ```
