@@ -52,7 +52,8 @@ impl SystemContent for Color {
     }
 }
 
-// Built-in implementations: String, Color, AristotelianCause, NumberedItem
+// Built-in implementations: String, NumberedItem
+// Note: Colors come from HyparchicRegistry (monadic adjunction Index ↔ Color)
 ```
 
 ### 4. Fiber (Lightweight Unit)
@@ -60,21 +61,21 @@ impl SystemContent for Color {
 let fiber = Fiber::new(
     UniversalIndex::new(1)?,
     Point3d::new(0.0, 0.0, 0.0),
-    Color::Red
+    String::from("Example")
 );
 
 // Essence lookups (no storage, on-demand)
 fiber.system_name();      // "Monad"
 fiber.coherence();        // "Unity"
-fiber.content();          // &Color::Red
+fiber.content();          // &String "Example"
 ```
 
 ### 5. Bidirectional Construction
 
 #### Top-Down Factory
 ```rust
-// "Create a Triad using Colors"
-let triad = System::generate(3, Color::Red)?;
+// "Create a Triad with String content"
+let triad = System::generate(3, String::from("Item"))?;
 
 // Automatically:
 // - Gets canonical coordinates
@@ -142,13 +143,13 @@ test result: ok. 19 passed; 0 failed; 0 ignored
 
 ### Example 1: Factory Pattern
 ```rust
-use systematics::core::{system::System, system_content::Color};
+use systematics::core::system::System;
 
 // Top-Down: Generate a Triad
-let triad = System::generate(3, Color::Red)?;
+let triad = System::generate(3, String::from("Item"))?;
 
 for fiber in triad.fibers() {
-    println!("Fiber {}: {:?}", fiber.index().value(), fiber.content());
+    println!("Fiber {}: {}", fiber.index().value(), fiber.content());
 }
 ```
 

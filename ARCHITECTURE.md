@@ -104,9 +104,9 @@ pub trait SystemContent: Clone + Debug {
 
 **Built-in Implementations**:
 - `String` - Generic text content
-- `Color` - RGB color vocabulary
-- `AristotelianCause` - Four causes (Formal, Final, Efficient, Material)
 - `NumberedItem` - Generic numbered items
+
+**Note**: Colors are handled by `HyparchicRegistry` (monadic adjunction: Index ↔ Color), not SystemContent.
 
 **Example**:
 ```rust
@@ -115,9 +115,10 @@ let base = String::from("Level");
 let items = base.provide(5);
 // Returns: ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5"]
 
-// Color implementation
-let colors = Color::Red.provide(3);
-// Returns: [Red, Green, Blue]
+// NumberedItem implementation
+let item = NumberedItem { label: "Step".to_string(), number: 0 };
+let items = item.provide(3);
+// Returns: [Step 1, Step 2, Step 3]
 ```
 
 ### 3. The Fiber (The Unit)
@@ -155,11 +156,11 @@ pub struct Fiber<T: SystemContent> {
 let fiber = Fiber::new(
     UniversalIndex::new(1)?,
     Point3d::new(0.0, 0.0, 0.0),
-    Color::Red
+    String::from("Item")
 );
 
 assert_eq!(fiber.system_name(), "Monad");  // Looked up, not stored!
-assert_eq!(fiber.content(), &Color::Red);
+assert_eq!(fiber.content(), &String::from("Item"));
 ```
 
 ### 4. The System (The Container)
@@ -203,7 +204,7 @@ pub fn generate(order: u8, content_provider: T) -> Result<System<T>, SystemError
 
 **Example**:
 ```rust
-let triad = System::generate(3, Color::Red)?;
+let triad = System::generate(3, String::from("Item"))?;
 // Creates a 3-node system with Red, Green, Blue content
 // Automatically gets correct triangle coordinates
 // Automatically generates complete graph connectivity

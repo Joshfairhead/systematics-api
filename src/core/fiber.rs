@@ -85,19 +85,18 @@ impl<T: SystemContent> PartialEq for Fiber<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::system_content::Color;
 
     #[test]
     fn test_fiber_creation() {
         let index = UniversalIndex::new(3).unwrap();
         let coords = Point3d::new(1.0, 0.0, 0.0);
-        let content = Color::Red;
+        let content = String::from("Test");
 
         let fiber = Fiber::new(index, coords, content);
 
         assert_eq!(fiber.index().value(), 3);
         assert_eq!(fiber.coordinates().x, 1.0);
-        assert_eq!(*fiber.content(), Color::Red);
+        assert_eq!(*fiber.content(), "Test");
     }
 
     #[test]

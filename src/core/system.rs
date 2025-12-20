@@ -229,29 +229,28 @@ impl<T: SystemContent> System<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::system_content::Color;
     use crate::core::system_topology::Point3d;
 
     #[test]
     fn test_generate_triad() {
-        let system = System::generate(3, Color::Red).unwrap();
+        let system = System::generate(3, String::from("Test")).unwrap();
 
         assert_eq!(system.order(), 3);
         assert_eq!(system.fibers().len(), 3);
         assert_eq!(system.connectivity().len(), 3);
 
         // Check that fibers have correct content
-        assert_eq!(*system.fibers()[0].content(), Color::Red);
-        assert_eq!(*system.fibers()[1].content(), Color::Green);
-        assert_eq!(*system.fibers()[2].content(), Color::Blue);
+        assert_eq!(*system.fibers()[0].content(), "Test 1");
+        assert_eq!(*system.fibers()[1].content(), "Test 2");
+        assert_eq!(*system.fibers()[2].content(), "Test 3");
     }
 
     #[test]
     fn test_generate_invalid_order() {
-        let result = System::generate(0, Color::Red);
+        let result = System::generate(0, String::from("Test"));
         assert!(result.is_err());
 
-        let result = System::generate(13, Color::Red);
+        let result = System::generate(13, String::from("Test"));
         assert!(result.is_err());
     }
 
@@ -316,7 +315,7 @@ mod tests {
 
     #[test]
     fn test_connectivity_queries() {
-        let system = System::generate(3, Color::Red).unwrap();
+        let system = System::generate(3, String::from("Test")).unwrap();
 
         let idx1 = UniversalIndex::new(1).unwrap();
         let idx2 = UniversalIndex::new(2).unwrap();

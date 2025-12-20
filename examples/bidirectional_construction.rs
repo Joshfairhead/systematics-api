@@ -1,7 +1,6 @@
 use systematics::core::{
     fiber::Fiber,
     system::System,
-    system_content::{AristotelianCause, Color},
     system_topology::SystemTopology,
     universal_index::UniversalIndex,
 };
@@ -42,11 +41,11 @@ fn main() {
     example_7_generate_and_decompose();
 }
 
-/// Example 1: Generate a Triad using the Color vocabulary
+/// Example 1: Generate a Triad using String content
 fn example_1_triad_with_colors() {
-    println!("Example 1: Creating a Triad with Colors");
+    println!("Example 1: Creating a Triad with String Content");
 
-    match System::generate(3, Color::Red) {
+    match System::generate(3, String::from("Item")) {
         Ok(triad) => {
             println!("✓ Generated Triad (Order: {})", triad.order());
 
@@ -71,11 +70,11 @@ fn example_1_triad_with_colors() {
     }
 }
 
-/// Example 2: Generate a Tetrad using Aristotelian Causes
+/// Example 2: Generate a Tetrad using String content
 fn example_2_tetrad_with_causes() {
-    println!("Example 2: Creating a Tetrad with Aristotelian Causes");
+    println!("Example 2: Creating a Tetrad with String Content");
 
-    match System::generate(4, AristotelianCause::Formal) {
+    match System::generate(4, String::from("Element")) {
         Ok(tetrad) => {
             println!("✓ Generated Tetrad (Order: {})", tetrad.order());
 
@@ -232,7 +231,7 @@ fn example_7_generate_and_decompose() {
 
     // Step 1: Generate a Triad
     println!("Step 1: Generate original Triad");
-    let original = System::generate(3, Color::Red).unwrap();
+    let original = System::generate(3, String::from("Test")).unwrap();
     println!("  ✓ Created with {} fibers", original.fibers().len());
 
     // Step 2: Extract fibers (simulate receiving them as data)
