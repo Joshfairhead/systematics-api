@@ -4,6 +4,7 @@ mod color;
 mod registry;
 mod node;
 mod point;
+mod mapping;
 
 pub use index::Index;
 pub use color::Color;
@@ -14,6 +15,7 @@ pub use node::{Node, Edge, MonadicNode, DyadicNode, TriadicNode, TetradicNode,
 pub use point::{Point, Line, MonadicPoint, DyadicPoint, TriadicPoint, TetradicPoint,
                 PentadicPoint, HexadicPoint, HeptadicPoint, OctadicPoint,
                 EnneadicPoint, DecadicPoint, UndecadicPoint, DodecadicPoint};
+pub use mapping::Mapping;
 
 // Supporting modules (legacy - to be refactored)
 pub mod topology;  // TODO: Migrate to node.rs
