@@ -2,14 +2,22 @@
 mod index;
 mod color;
 mod registry;
+mod node;
+mod point;
 
 pub use index::Index;
 pub use color::Color;
 pub use registry::{Registry, CANONICAL};
+pub use node::{Node, Edge, MonadicNode, DyadicNode, TriadicNode, TetradicNode,
+               PentadicNode, HexadicNode, HeptadicNode, OctadicNode,
+               EnneadicNode, DecadicNode, UndecadicNode, DodecadicNode};
+pub use point::{Point, Line, MonadicPoint, DyadicPoint, TriadicPoint, TetradicPoint,
+                PentadicPoint, HexadicPoint, HeptadicPoint, OctadicPoint,
+                EnneadicPoint, DecadicPoint, UndecadicPoint, DodecadicPoint};
 
-// Supporting modules
-pub mod topology;
-pub mod geometry;
+// Supporting modules (legacy - to be refactored)
+pub mod topology;  // TODO: Migrate to node.rs
+pub mod geometry;  // TODO: Migrate to point.rs
 pub mod essence;
 pub mod system_topology;
 pub mod system_content;
