@@ -2,7 +2,7 @@ use systematics::core::{
     fiber::Fiber,
     system::System,
     system_topology::SystemTopology,
-    universal_index::UniversalIndex,
+    Index,
 };
 
 fn main() {
@@ -89,8 +89,8 @@ fn example_2_tetrad_with_causes() {
             }
 
             // Check connectivity
-            let idx1 = UniversalIndex::new(1).unwrap();
-            let idx2 = UniversalIndex::new(2).unwrap();
+            let idx1 = Index::One;
+            let idx2 = Index::Two;
             println!(
                 "  Fiber 1 → Fiber 2 connected: {}",
                 tetrad.is_connected(idx1, idx2).unwrap()
@@ -128,13 +128,13 @@ fn example_4_assemble_dyad() {
     let coords = SystemTopology::get_coordinates(2).unwrap();
 
     let fiber1 = Fiber::new(
-        UniversalIndex::new(1).unwrap(),
+        Index::One,
         coords[0],
         String::from("Essence"),
     );
 
     let fiber2 = Fiber::new(
-        UniversalIndex::new(2).unwrap(),
+        Index::Two,
         coords[1],
         String::from("Existence"),
     );
@@ -175,7 +175,7 @@ fn example_5_assemble_hexad() {
     let mut fibers = Vec::new();
     for (i, label) in labels.iter().enumerate() {
         let fiber = Fiber::new(
-            UniversalIndex::new((i + 1) as u8).unwrap(),
+            Index::from_value((i + 1) as u8).unwrap(),
             coords[i],
             String::from(*label),
         );
@@ -189,7 +189,7 @@ fn example_5_assemble_hexad() {
             println!("  Coherence: {}", hexad.fibers()[0].coherence());
 
             // Show all connections for first fiber
-            let idx1 = UniversalIndex::new(1).unwrap();
+            let idx1 = Index::One;
             let connections = hexad.connections(idx1).unwrap();
             println!(
                 "  Fiber 1 is connected to {} other fibers",
@@ -208,13 +208,13 @@ fn example_6_invalid_assembly() {
 
     // Missing index 1, has 2 and 3 instead
     let fiber2 = Fiber::new(
-        UniversalIndex::new(2).unwrap(),
+        Index::Two,
         coords[1],
         String::from("Second"),
     );
 
     let fiber3 = Fiber::new(
-        UniversalIndex::new(3).unwrap(),
+        Index::Three,
         coords[2],
         String::from("Third"),
     );
@@ -251,7 +251,7 @@ fn example_7_generate_and_decompose() {
             println!("  System validated: {}", reassembled.fibers()[0].system_name());
 
             // Verify connectivity preserved
-            let idx1 = UniversalIndex::new(1).unwrap();
+            let idx1 = Index::One;
             let connections = reassembled.connections(idx1).unwrap();
             println!("  Connectivity preserved: {} connections", connections.len());
         }

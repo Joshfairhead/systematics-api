@@ -1,5 +1,5 @@
 use systematics::core::{
-    hyparchic_registry::{Color, HyparchicRegistry, Index},
+    Index, Color,
     system_topology::SystemTopology,
 };
 
@@ -32,9 +32,9 @@ fn print_hyparchic_registry() {
     println!("  HYPARCHIC REGISTRY (Universal Color ↔ Index Mapping)");
     println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-    let pairs = HyparchicRegistry::all_pairs();
-    for (index, color) in pairs {
-        println!("  Index {:2} ↔ {:<20}", index.value(), format!("{}", color));
+    for index in Index::all() {
+        let color = Color::from_index(index);
+        println!("  Index {:2} ↔ {:<20}", index.value(), color.canonical_name());
     }
     println!();
 }
@@ -52,18 +52,19 @@ fn print_system_mappings(order: u8) {
             println!("  ─────────────────────────────────────────────────────────");
 
             for (position, coord) in coords.iter().enumerate() {
-                let index = Index::from_zero_based(position).unwrap();
-                let color = HyparchicRegistry::get_color(index);
+                if let Some(index) = Index::from_zero_based(position) {
+                    let color = Color::from_index(index);
 
-                println!(
-                    "  Position {} │ ({:7.3}, {:7.3}, {:7.3}) → Index {:2} → {}",
-                    position,
-                    coord.x,
-                    coord.y,
-                    coord.z,
-                    index.value(),
-                    color
-                );
+                    println!(
+                        "  Position {} │ ({:7.3}, {:7.3}, {:7.3}) → Index {:2} → {}",
+                        position,
+                        coord.x,
+                        coord.y,
+                        coord.z,
+                        index.value(),
+                        color.canonical_name()
+                    );
+                }
             }
 
             // Show connectivity information

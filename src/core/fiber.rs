@@ -1,19 +1,19 @@
 use crate::core::essence::Essence;
 use crate::core::system_content::SystemContent;
 use crate::core::system_topology::Point3d;
-use crate::core::universal_index::UniversalIndex;
+use crate::core::Index;
 
 /// Fiber is the fundamental unit containing index, coordinates, and content
 #[derive(Debug, Clone)]
 pub struct Fiber<T: SystemContent> {
-    index: UniversalIndex,
+    index: Index,
     coordinates: Point3d,
     content: T,
 }
 
 impl<T: SystemContent> Fiber<T> {
     /// Create a new Fiber
-    pub fn new(index: UniversalIndex, coordinates: Point3d, content: T) -> Self {
+    pub fn new(index: Index, coordinates: Point3d, content: T) -> Self {
         Self {
             index,
             coordinates,
@@ -21,8 +21,8 @@ impl<T: SystemContent> Fiber<T> {
         }
     }
 
-    /// Get the UniversalIndex
-    pub fn index(&self) -> UniversalIndex {
+    /// Get the Index
+    pub fn index(&self) -> Index {
         self.index
     }
 
@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_fiber_creation() {
-        let index = UniversalIndex::new(3).unwrap();
+        let index = Index::Three;
         let coords = Point3d::new(1.0, 0.0, 0.0);
         let content = String::from("Test");
 
@@ -101,7 +101,7 @@ mod tests {
 
     #[test]
     fn test_essence_lookups() {
-        let index = UniversalIndex::new(1).unwrap();
+        let index = Index::One;
         let coords = Point3d::new(0.0, 0.0, 0.0);
         let fiber = Fiber::new(index, coords, String::from("Unity"));
 
@@ -113,7 +113,7 @@ mod tests {
 
     #[test]
     fn test_essence_without_designations() {
-        let index = UniversalIndex::new(9).unwrap();
+        let index = Index::Nine;
         let coords = Point3d::new(0.0, 0.0, 0.0);
         let fiber = Fiber::new(index, coords, String::from("Transform"));
 
