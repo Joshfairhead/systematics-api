@@ -1,5 +1,5 @@
 use crate::core::geometry::Coordinates;
-use crate::core::universal_index::UniversalIndex;
+use crate::core::Index;
 
 /// Point3d represents a 3D coordinate
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -50,7 +50,7 @@ impl SystemTopology {
     }
 
     /// Get coordinate for a specific index within a system
-    pub fn get_coordinate(index: UniversalIndex, system_order: u8) -> Result<Point3d, &'static str> {
+    pub fn get_coordinate(index: Index, system_order: u8) -> Result<Point3d, &'static str> {
         let coords = Self::get_coordinates(system_order)?;
         let zero_based = index.to_zero_based();
 

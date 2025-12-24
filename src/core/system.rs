@@ -1,7 +1,7 @@
 use crate::core::fiber::Fiber;
 use crate::core::system_content::SystemContent;
 use crate::core::system_topology::SystemTopology;
-use crate::core::universal_index::UniversalIndex;
+use crate::core::Index;
 use std::fmt;
 
 /// Error types for System operations
@@ -52,7 +52,7 @@ impl<T: SystemContent> System<T> {
     }
 
     /// Check if two indices are connected
-    pub fn is_connected(&self, from: UniversalIndex, to: UniversalIndex) -> Result<bool, SystemError> {
+    pub fn is_connected(&self, from: Index, to: Index) -> Result<bool, SystemError> {
         let from_idx = from.to_zero_based();
         let to_idx = to.to_zero_based();
 
@@ -66,7 +66,7 @@ impl<T: SystemContent> System<T> {
     }
 
     /// Get all connections for a given index
-    pub fn connections(&self, index: UniversalIndex) -> Result<Vec<UniversalIndex>, SystemError> {
+    pub fn connections(&self, index: Index) -> Result<Vec<Index>, SystemError> {
         let idx = index.to_zero_based();
 
         if idx >= self.connectivity.len() {
@@ -78,7 +78,7 @@ impl<T: SystemContent> System<T> {
         let mut connections = Vec::new();
         for (i, &connected) in self.connectivity[idx].iter().enumerate() {
             if connected {
-                if let Ok(target_index) = UniversalIndex::from_zero_based(i) {
+                if let Some(target_index) = Index::from_zero_based(i) {
                     connections.push(target_index);
                 }
             }
@@ -115,8 +115,8 @@ impl<T: SystemContent> System<T> {
         // Create fibers
         let mut fibers = Vec::new();
         for i in 0..order {
-            let index = UniversalIndex::new(i + 1)
-                .map_err(|e| SystemError::InvalidIndices(e.to_string()))?;
+            let index = Index::from_value(i + 1)
+                .ok_or_else(|| SystemError::InvalidIndices("Invalid index".to_string()))?;
 
             let fiber = Fiber::new(
                 index,
@@ -260,12 +260,12 @@ mod tests {
         let coords = SystemTopology::get_coordinates(2).unwrap();
 
         let fiber1 = Fiber::new(
-            UniversalIndex::new(1).unwrap(),
+            Index::One,
             coords[0],
             String::from("First"),
         );
         let fiber2 = Fiber::new(
-            UniversalIndex::new(2).unwrap(),
+            Index::Two,
             coords[1],
             String::from("Second"),
         );
@@ -282,12 +282,12 @@ mod tests {
 
         // Missing index 1, has 2 and 3
         let fiber2 = Fiber::new(
-            UniversalIndex::new(2).unwrap(),
+            Index::Two,
             coords[0],
             String::from("Second"),
         );
         let fiber3 = Fiber::new(
-            UniversalIndex::new(3).unwrap(),
+            Index::Three,
             coords[1],
             String::from("Third"),
         );
@@ -299,12 +299,12 @@ mod tests {
     #[test]
     fn test_try_assemble_invalid_coordinates() {
         let fiber1 = Fiber::new(
-            UniversalIndex::new(1).unwrap(),
+            Index::One,
             Point3d::new(0.0, 0.0, 0.0), // Wrong coordinate
             String::from("First"),
         );
         let fiber2 = Fiber::new(
-            UniversalIndex::new(2).unwrap(),
+            Index::Two,
             Point3d::new(999.0, 999.0, 0.0), // Wrong coordinate
             String::from("Second"),
         );
@@ -317,8 +317,8 @@ mod tests {
     fn test_connectivity_queries() {
         let system = System::generate(3, String::from("Test")).unwrap();
 
-        let idx1 = UniversalIndex::new(1).unwrap();
-        let idx2 = UniversalIndex::new(2).unwrap();
+        let idx1 = Index::One;
+        let idx2 = Index::Two;
 
         // In complete graph, all nodes are connected
         assert!(system.is_connected(idx1, idx2).unwrap());

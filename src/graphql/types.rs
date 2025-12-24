@@ -1,7 +1,7 @@
 use async_graphql::*;
 use crate::core::topology::Node;
 use crate::core::geometry::Coordinates as CoreCoordinates;
-use crate::core::hyparchic_registry::{HyparchicRegistry, Index as HyparchicIndex};
+use crate::core::{Index, CANONICAL};
 
 /// A coordinate in 2D or 3D space
 #[derive(Clone, Copy, Debug)]
@@ -171,10 +171,9 @@ impl System {
     /// Color associated with this system based on its order
     async fn color(&self) -> String {
         let order = self.nodes.len();
-        let hyparchic_index = HyparchicIndex::new(order as u8)
-            .unwrap_or_else(|_| HyparchicIndex::new(1).unwrap());
-        let color = HyparchicRegistry::get_color(hyparchic_index);
-        color.as_str().to_string()
+        let index = Index::from_value(order as u8)
+            .unwrap_or(Index::One);
+        CANONICAL.color_name(index, None).to_string()
     }
 
     async fn term_characters(&self) -> Vec<Term> {
@@ -266,20 +265,18 @@ impl Term {
     async fn color(&self) -> String {
         // Get the mapped index from the system's INDEX_MAPPING
         let mapped_index = Term::get_mapped_index_for_system(&self.system_name, self.index);
-        let hyparchic_index = HyparchicIndex::new(mapped_index)
-            .unwrap_or_else(|_| HyparchicIndex::new(1).unwrap());
-        let color = HyparchicRegistry::get_color(hyparchic_index);
-        color.as_str().to_string()
+        let index = Index::from_value(mapped_index)
+            .unwrap_or(Index::One);
+        CANONICAL.color_name(index, None).to_string()
     }
 
     /// Hex color code associated with this index position (via INDEX_MAPPING)
     async fn hex_color(&self) -> String {
         // Get the mapped index from the system's INDEX_MAPPING
         let mapped_index = Term::get_mapped_index_for_system(&self.system_name, self.index);
-        let hyparchic_index = HyparchicIndex::new(mapped_index)
-            .unwrap_or_else(|_| HyparchicIndex::new(1).unwrap());
-        let color = HyparchicRegistry::get_color(hyparchic_index);
-        color.hex_code().to_string()
+        let index = Index::from_value(mapped_index)
+            .unwrap_or(Index::One);
+        CANONICAL.color_hex(index, None).to_string()
     }
 
     async fn coordinate(&self) -> Option<Coordinate> {

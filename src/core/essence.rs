@@ -1,4 +1,4 @@
-use crate::core::universal_index::UniversalIndex;
+use crate::core::Index;
 
 /// Essence data (metadata) for each system order
 #[derive(Debug, Clone)]
@@ -9,7 +9,7 @@ pub struct EssenceData {
     pub connective_designation: Option<&'static str>,
 }
 
-/// Static registry of Essence data indexed by UniversalIndex (1-12)
+/// Static registry of Essence data indexed by Index (1-12)
 static ESSENCE_REGISTRY: [EssenceData; 12] = [
     // Index 1: Monad
     EssenceData {
@@ -101,28 +101,28 @@ static ESSENCE_REGISTRY: [EssenceData; 12] = [
 pub struct Essence;
 
 impl Essence {
-    /// Look up essence data by UniversalIndex
-    pub fn lookup(index: UniversalIndex) -> &'static EssenceData {
+    /// Look up essence data by Index
+    pub fn lookup(index: Index) -> &'static EssenceData {
         &ESSENCE_REGISTRY[index.to_zero_based()]
     }
 
     /// Get system name for an index
-    pub fn system_name(index: UniversalIndex) -> &'static str {
+    pub fn system_name(index: Index) -> &'static str {
         Self::lookup(index).system_name
     }
 
     /// Get coherence attribute for an index
-    pub fn coherence(index: UniversalIndex) -> &'static str {
+    pub fn coherence(index: Index) -> &'static str {
         Self::lookup(index).coherence
     }
 
     /// Get term designation for an index (if available)
-    pub fn term_designation(index: UniversalIndex) -> Option<&'static str> {
+    pub fn term_designation(index: Index) -> Option<&'static str> {
         Self::lookup(index).term_designation
     }
 
     /// Get connective designation for an index (if available)
-    pub fn connective_designation(index: UniversalIndex) -> Option<&'static str> {
+    pub fn connective_designation(index: Index) -> Option<&'static str> {
         Self::lookup(index).connective_designation
     }
 }
@@ -133,13 +133,13 @@ mod tests {
 
     #[test]
     fn test_essence_lookup() {
-        let monad = UniversalIndex::new(1).unwrap();
+        let monad = Index::One;
         assert_eq!(Essence::system_name(monad), "Monad");
         assert_eq!(Essence::coherence(monad), "Unity");
         assert_eq!(Essence::term_designation(monad), Some("Totality"));
         assert_eq!(Essence::connective_designation(monad), Some("Unity"));
 
-        let dodecad = UniversalIndex::new(12).unwrap();
+        let dodecad = Index::Twelve;
         assert_eq!(Essence::system_name(dodecad), "Dodecad");
         assert_eq!(Essence::coherence(dodecad), "Perfection");
         assert_eq!(Essence::term_designation(dodecad), None);
