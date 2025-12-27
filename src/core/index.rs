@@ -69,6 +69,28 @@ impl Index {
         }
     }
 
+    /// Map to standard simplex category Δ (0-indexed).
+    ///
+    /// In the simplex category, objects are denoted [0], [1], [2], etc.
+    /// This maps our 1-based Index to the standard 0-based notation:
+    /// - Index::One → Δ[0]
+    /// - Index::Two → Δ[1]
+    /// - Index::Three → Δ[2]
+    #[inline]
+    pub fn to_delta(&self) -> u8 {
+        self.value() - 1
+    }
+
+    /// Create from standard simplex category Δ (0-indexed).
+    ///
+    /// Maps from the standard 0-based simplex category notation:
+    /// - Δ[0] → Index::One
+    /// - Δ[1] → Index::Two
+    /// - Δ[2] → Index::Three
+    pub fn from_delta(n: u8) -> Option<Self> {
+        Self::from_value(n + 1)
+    }
+
     /// Get all indices in order
     pub fn all() -> [Index; 12] {
         [
@@ -200,5 +222,31 @@ mod tests {
         // Verify that the enum discriminants are correctly set
         assert_eq!(Index::One as u8, 1);
         assert_eq!(Index::Twelve as u8, 12);
+    }
+
+    #[test]
+    fn test_delta_conversion() {
+        // to_delta maps 1-based Index to 0-based simplex category
+        assert_eq!(Index::One.to_delta(), 0);
+        assert_eq!(Index::Two.to_delta(), 1);
+        assert_eq!(Index::Three.to_delta(), 2);
+        assert_eq!(Index::Twelve.to_delta(), 11);
+
+        // from_delta maps 0-based simplex category to 1-based Index
+        assert_eq!(Index::from_delta(0), Some(Index::One));
+        assert_eq!(Index::from_delta(1), Some(Index::Two));
+        assert_eq!(Index::from_delta(2), Some(Index::Three));
+        assert_eq!(Index::from_delta(11), Some(Index::Twelve));
+        assert_eq!(Index::from_delta(12), None); // Out of range
+    }
+
+    #[test]
+    fn test_delta_roundtrip() {
+        // Verify roundtrip for all indices
+        for idx in Index::all() {
+            let delta = idx.to_delta();
+            let recovered = Index::from_delta(delta);
+            assert_eq!(recovered, Some(idx));
+        }
     }
 }

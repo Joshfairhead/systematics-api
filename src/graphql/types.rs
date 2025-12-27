@@ -1,7 +1,11 @@
 use async_graphql::*;
 use crate::core::topology::Node;
 use crate::core::geometry::Coordinates as CoreCoordinates;
-use crate::core::{Index, CANONICAL};
+use crate::core::{Index, CANONICAL, Color};
+use crate::core::generators::{generate_simplex, generate_fiber, generate_fiber_with, generate_system, generate_system_with};
+use crate::core::config::{FiberConfig, SystemConfig};
+use crate::core::transforms::{from_system_name, from_coherence, from_edge_count};
+use crate::graphql::category_types::*;
 
 /// A coordinate in 2D or 3D space
 #[derive(Clone, Copy, Debug)]
@@ -39,18 +43,18 @@ impl From<CoreCoordinates> for Coordinate {
 /// A line connecting two coordinates
 #[derive(Clone, Copy, Debug)]
 pub struct Line {
-    pub start: Coordinate,
-    pub end: Coordinate,
+    pub from: Coordinate,
+    pub to: Coordinate,
 }
 
 #[Object]
 impl Line {
-    async fn start(&self) -> Coordinate {
-        self.start
+    async fn from(&self) -> Coordinate {
+        self.from
     }
 
-    async fn end(&self) -> Coordinate {
-        self.end
+    async fn to(&self) -> Coordinate {
+        self.to
     }
 }
 
@@ -78,8 +82,8 @@ impl Edge {
 #[derive(Clone, Debug)]
 pub struct Connector {
     pub name: String,
-    pub from_term: String,
-    pub to_term: String,
+    pub from: String,
+    pub to: String,
 }
 
 #[Object]
@@ -88,12 +92,12 @@ impl Connector {
         &self.name
     }
 
-    async fn from_term(&self) -> &str {
-        &self.from_term
+    async fn from(&self) -> &str {
+        &self.from
     }
 
-    async fn to_term(&self) -> &str {
-        &self.to_term
+    async fn to(&self) -> &str {
+        &self.to
     }
 }
 
@@ -437,6 +441,157 @@ impl QueryRoot {
             .filter(|s| s.term_designation.eq_ignore_ascii_case(&designation))
             .collect()
     }
+
+    // ========================================================================
+    // Category-Theoretic API (New Generator-Based Queries)
+    // ========================================================================
+
+    // === Index Queries ===
+
+    /// Get information about an index value (1-12)
+    async fn index(&self, value: i32) -> Option<IndexInfo> {
+        Index::from_value(value as u8).map(|index| IndexInfo::new(index))
+    }
+
+    /// Get all valid index values with their metadata
+    async fn all_indices(&self) -> Vec<IndexInfo> {
+        (1..=12)
+            .filter_map(Index::from_value)
+            .map(|index| IndexInfo::new(index))
+            .collect()
+    }
+
+    /// Look up index by system name (co-determination)
+    async fn index_by_name(&self, name: String) -> Option<IndexInfo> {
+        from_system_name(&name).map(|index| IndexInfo::new(index))
+    }
+
+    /// Look up index by coherence attribute (co-determination)
+    async fn index_by_coherence(&self, coherence: String) -> Option<IndexInfo> {
+        from_coherence(&coherence).map(|index| IndexInfo::new(index))
+    }
+
+    /// Look up index by edge count (co-determination)
+    async fn index_by_edge_count(&self, count: i32) -> Option<IndexInfo> {
+        from_edge_count(count as u8).map(|index| IndexInfo::new(index))
+    }
+
+    // === Color Queries ===
+
+    /// Get information about a color value (1-12)
+    async fn color(&self, value: i32) -> Option<ColorInfo> {
+        if value < 1 || value > 12 {
+            return None;
+        }
+        Index::from_value(value as u8).map(|idx| ColorInfo::new(Color::from_index(idx)))
+    }
+
+    /// Get all colors with their metadata
+    async fn all_colors(&self) -> Vec<ColorInfo> {
+        (1..=12)
+            .filter_map(Index::from_value)
+            .map(|idx| ColorInfo::new(Color::from_index(idx)))
+            .collect()
+    }
+
+    // === Simplex Queries ===
+
+    /// Generate a simplex scaffold (Kn complete graph) for a given order
+    async fn simplex(&self, order: i32) -> Option<GqlSimplexView> {
+        Index::from_value(order as u8).map(|idx| GqlSimplexView::new(generate_simplex(idx)))
+    }
+
+    // === Fiber Queries ===
+
+    /// Generate a fiber with default categories (Index, Geometric, Vocabulary)
+    async fn fiber(&self, order: i32, position: i32) -> Option<GqlFiberView> {
+        let order_idx = Index::from_value(order as u8)?;
+        let pos_idx = Index::from_value(position as u8)?;
+        generate_fiber(order_idx, pos_idx).map(|f| GqlFiberView::new(f))
+    }
+
+    /// Generate a fiber with custom configuration
+    async fn fiber_with(
+        &self,
+        order: i32,
+        position: i32,
+        config: FiberConfigInput,
+    ) -> Option<GqlFiberView> {
+        let order_idx = Index::from_value(order as u8)?;
+        let pos_idx = Index::from_value(position as u8)?;
+
+        let fiber_config = FiberConfig {
+            categories: config.categories
+                .map(|cats| cats.into_iter().map(|c| c.into()).collect())
+                .unwrap_or_else(|| FiberConfig::default().categories),
+        };
+
+        generate_fiber_with(order_idx, pos_idx, &fiber_config).map(|f| GqlFiberView::new(f))
+    }
+
+    // === Generated System Queries ===
+
+    /// Generate a system view with default configuration
+    async fn generate_system(&self, order: i32) -> Option<GqlSystemView> {
+        Index::from_value(order as u8).map(|idx| GqlSystemView::new(generate_system(idx)))
+    }
+
+    /// Generate a system view with custom configuration
+    async fn generate_system_with(
+        &self,
+        order: i32,
+        config: SystemConfigInput,
+    ) -> Option<GqlSystemView> {
+        let order_idx = Index::from_value(order as u8)?;
+
+        let system_config = SystemConfig {
+            categories: config.categories
+                .map(|cats| cats.into_iter().map(|c| c.into()).collect())
+                .unwrap_or_else(|| SystemConfig::default().categories),
+            include_metadata: config.include_metadata
+                .map(|metas| metas.into_iter().map(|m| m.into()).collect())
+                .unwrap_or_else(|| SystemConfig::default().include_metadata),
+        };
+
+        Some(GqlSystemView::new(generate_system_with(order_idx, &system_config)))
+    }
+
+    /// Generate all systems (1-12) with default configuration
+    async fn generate_all_systems(&self) -> Vec<GqlSystemView> {
+        (1..=12)
+            .filter_map(Index::from_value)
+            .map(|idx| GqlSystemView::new(generate_system(idx)))
+            .collect()
+    }
+
+    /// Generate a system with all categories and all metadata
+    async fn generate_full_system(&self, order: i32) -> Option<GqlSystemView> {
+        let order_idx = Index::from_value(order as u8)?;
+        Some(GqlSystemView::new(generate_system_with(order_idx, &SystemConfig::full())))
+    }
+
+    // === Category Info ===
+
+    /// Get all available category types
+    async fn category_types(&self) -> Vec<GqlCategoryType> {
+        vec![
+            GqlCategoryType::Index,
+            GqlCategoryType::Topological,
+            GqlCategoryType::Geometric,
+            GqlCategoryType::Lexicon,
+            GqlCategoryType::Color,
+        ]
+    }
+
+    /// Get all available metadata types
+    async fn metadata_types(&self) -> Vec<GqlMetadataType> {
+        vec![
+            GqlMetadataType::Name,
+            GqlMetadataType::Coherence,
+            GqlMetadataType::TermDesignation,
+            GqlMetadataType::ConnectiveDesignation,
+        ]
+    }
 }
 
 impl System {
@@ -513,8 +668,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: MonadSystem::NODES.to_vec(),
@@ -526,8 +681,8 @@ impl QueryRoot {
             lines: MonadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -546,8 +701,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: DyadSystem::NODES.to_vec(),
@@ -559,8 +714,8 @@ impl QueryRoot {
             lines: DyadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -579,8 +734,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: TriadSystem::NODES.to_vec(),
@@ -592,8 +747,8 @@ impl QueryRoot {
             lines: TriadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -612,8 +767,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: TetradSystem::NODES.to_vec(),
@@ -625,8 +780,8 @@ impl QueryRoot {
             lines: TetradSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -645,8 +800,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: PentadSystem::NODES.to_vec(),
@@ -658,8 +813,8 @@ impl QueryRoot {
             lines: PentadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -678,8 +833,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: HexadSystem::NODES.to_vec(),
@@ -691,8 +846,8 @@ impl QueryRoot {
             lines: HexadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -711,8 +866,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: HeptadSystem::NODES.to_vec(),
@@ -724,8 +879,8 @@ impl QueryRoot {
             lines: HeptadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -744,8 +899,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: OctadSystem::NODES.to_vec(),
@@ -757,8 +912,8 @@ impl QueryRoot {
             lines: OctadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -777,8 +932,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: EnneadSystem::NODES.to_vec(),
@@ -790,8 +945,8 @@ impl QueryRoot {
             lines: EnneadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -810,8 +965,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: DecadSystem::NODES.to_vec(),
@@ -823,8 +978,8 @@ impl QueryRoot {
             lines: DecadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -843,8 +998,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: UndecadSystem::NODES.to_vec(),
@@ -856,8 +1011,8 @@ impl QueryRoot {
             lines: UndecadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }
@@ -876,8 +1031,8 @@ impl QueryRoot {
                 .iter()
                 .map(|(name, from, to)| Connector {
                     name: name.to_string(),
-                    from_term: from.to_string(),
-                    to_term: to.to_string(),
+                    from: from.to_string(),
+                    to: to.to_string(),
                 })
                 .collect(),
             nodes: DodecadSystem::NODES.to_vec(),
@@ -889,8 +1044,8 @@ impl QueryRoot {
             lines: DodecadSystem::LINES
                 .iter()
                 .map(|&(start, end)| Line {
-                    start: start.into(),
-                    end: end.into(),
+                    from: start.into(),
+                    to: end.into(),
                 })
                 .collect(),
         }

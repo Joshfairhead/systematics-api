@@ -6,6 +6,16 @@ mod node;
 mod point;
 mod mapping;
 
+// New category-theoretic modules
+pub mod category;
+pub mod entry;
+pub mod transforms;
+pub mod views;
+pub mod config;
+pub mod link;
+pub mod connective;
+pub mod generators;
+
 pub use index::Index;
 pub use color::Color;
 pub use registry::{Registry, CANONICAL};
@@ -16,6 +26,15 @@ pub use point::{Point, Line, MonadicPoint, DyadicPoint, TriadicPoint, TetradicPo
                 PentadicPoint, HexadicPoint, HeptadicPoint, OctadicPoint,
                 EnneadicPoint, DecadicPoint, UndecadicPoint, DodecadicPoint};
 pub use mapping::Mapping;
+
+// Re-export new types for convenient access
+pub use category::CategoryType;
+pub use entry::{Entry, GeometricEntry, LexiconEntry};
+pub use views::{SimplexView, FiberView, SystemView, MetadataType};
+pub use config::{FiberConfig, SystemConfig, DEFAULT_CATEGORIES, ALL_CATEGORIES};
+pub use link::{Link, LinkInfo};
+pub use connective::Connective;
+pub use generators::{generate_simplex, generate_fiber, generate_fiber_with, generate_system, generate_system_with};
 
 // Supporting modules (legacy - to be refactored)
 pub mod topology;  // TODO: Migrate to node.rs

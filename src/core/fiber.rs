@@ -1,7 +1,9 @@
+use crate::core::category::CategoryType;
 use crate::core::essence::Essence;
 use crate::core::system_content::SystemContent;
 use crate::core::system_topology::Point3d;
-use crate::core::{Index, Color, Node, Point as GeometricPoint};
+use crate::core::views::FiberView;
+use crate::core::{Color, Index, Node, Point as GeometricPoint};
 
 /// Fiber is the fundamental unit bundling together:
 /// - Reference types: Index and Color (isomorphic identifiers)
@@ -131,6 +133,53 @@ impl<T: SystemContent> PartialEq for Fiber<T> {
     }
 }
 
+// ============================================================================
+// Conversion from FiberView
+// ============================================================================
+
+impl Fiber<String> {
+    /// Create a Fiber from a FiberView.
+    ///
+    /// The FiberView must contain at least an Index entry.
+    /// Coordinates are extracted from the Geometric entry if present,
+    /// otherwise defaults to origin.
+    /// Content is extracted from the Lexicon entry term if present,
+    /// otherwise defaults to empty string.
+    ///
+    /// Returns None if the FiberView doesn't contain an Index entry.
+    pub fn try_from_view(view: &FiberView) -> Option<Self> {
+        // Extract index from the view
+        let index = view.position;
+
+        // Extract coordinates from Geometric entry if present
+        let coordinates = view
+            .get(CategoryType::Geometric)
+            .and_then(|e| e.as_geometric())
+            .map(|g| g.coordinates)
+            .unwrap_or_else(|| Point3d::new(0.0, 0.0, 0.0));
+
+        // Extract content from Lexicon entry if present
+        let content = view
+            .get(CategoryType::Lexicon)
+            .and_then(|e| e.as_lexicon())
+            .map(|l| l.term.clone())
+            .unwrap_or_default();
+
+        Some(Self {
+            index,
+            order: view.order.value(),
+            coordinates,
+            content,
+        })
+    }
+
+    /// Create a Fiber from a FiberView, using the FiberView's data directly.
+    /// Panics if conversion fails.
+    pub fn from_view(view: &FiberView) -> Self {
+        Self::try_from_view(view).expect("FiberView should be valid")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -217,5 +266,31 @@ mod tests {
         assert_eq!(fiber.coherence(), "Transformation");
         assert_eq!(fiber.term_designation(), None);
         assert_eq!(fiber.connective_designation(), None);
+    }
+
+    #[test]
+    fn test_fiber_from_view() {
+        use crate::core::generators::generate_fiber;
+
+        let view = generate_fiber(Index::Three, Index::One).unwrap();
+        let fiber = Fiber::from_view(&view);
+
+        assert_eq!(fiber.index(), Index::One);
+        assert_eq!(fiber.order(), 3);
+        // Coordinates should be set from the geometric entry
+        // Content should be set from vocabulary
+        assert!(!fiber.content().is_empty());
+    }
+
+    #[test]
+    fn test_fiber_try_from_view() {
+        use crate::core::generators::generate_fiber;
+
+        let view = generate_fiber(Index::Three, Index::Two).unwrap();
+        let fiber = Fiber::try_from_view(&view);
+
+        assert!(fiber.is_some());
+        let fiber = fiber.unwrap();
+        assert_eq!(fiber.index(), Index::Two);
     }
 }
