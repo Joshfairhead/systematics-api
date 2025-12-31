@@ -1,46 +1,27 @@
-// Core reference types (re-exported at module root for flat access)
-mod index;
-mod color;
-mod registry;
-mod node;
-mod point;
-mod mapping;
+//! Core types for the Systematics property graph.
+//!
+//! This module provides the fundamental building blocks:
+//! - `Language` - Semantic vocabularies and representation types
+//! - `entries` - Entry types (Character, Term, Coordinate, Colour, etc.)
+//! - `links` - Link types (Line, Edge, Connective)
+//! - `graph` - Graph structure with Entry enum and queries
 
-// New category-theoretic modules
-pub mod category;
-pub mod entry;
-pub mod transforms;
-pub mod views;
-pub mod config;
-pub mod link;
-pub mod connective;
-pub mod generators;
+pub mod language;
+pub mod entries;
+pub mod links;
+pub mod graph;
 
-pub use index::Index;
-pub use color::Color;
-pub use registry::{Registry, CANONICAL};
-pub use node::{Node, Edge, MonadicNode, DyadicNode, TriadicNode, TetradicNode,
-               PentadicNode, HexadicNode, HeptadicNode, OctadicNode,
-               EnneadicNode, DecadicNode, UndecadicNode, DodecadicNode};
-pub use point::{Point, Line, MonadicPoint, DyadicPoint, TriadicPoint, TetradicPoint,
-                PentadicPoint, HexadicPoint, HeptadicPoint, OctadicPoint,
-                EnneadicPoint, DecadicPoint, UndecadicPoint, DodecadicPoint};
-pub use mapping::Mapping;
+// Re-export language types
+pub use language::Language;
 
-// Re-export new types for convenient access
-pub use category::CategoryType;
-pub use entry::{Entry, GeometricEntry, LexiconEntry};
-pub use views::{SimplexView, FiberView, SystemView, MetadataType};
-pub use config::{FiberConfig, SystemConfig, DEFAULT_CATEGORIES, ALL_CATEGORIES};
-pub use link::{Link, LinkInfo};
-pub use connective::Connective;
-pub use generators::{generate_simplex, generate_fiber, generate_fiber_with, generate_system, generate_system_with};
+// Re-export entry types
+pub use entries::{
+    Character, CoherenceAttribute, ConnectiveDesignation, Colour, Coordinate, Point3d,
+    SystemName, Term, TermDesignation,
+};
 
-// Supporting modules (legacy - to be refactored)
-pub mod topology;  // TODO: Migrate to node.rs
-pub mod geometry;  // TODO: Migrate to point.rs
-pub mod essence;
-pub mod system_topology;
-pub mod system_content;
-pub mod fiber;
-pub mod system;
+// Re-export link types
+pub use links::{Link, LinkType};
+
+// Re-export graph types
+pub use graph::{Entry, Graph};
