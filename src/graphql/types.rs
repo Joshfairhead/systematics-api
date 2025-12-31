@@ -444,6 +444,54 @@ impl GqlLink {
             .map(|p| p as i32)
     }
 
+    /// Base coordinate (for line links, returns the coordinate directly; for other links, looks up by position)
+    async fn base_coordinate(&self) -> Option<GqlCoordinate> {
+        let base_entry = self.graph.get_entry(&self.link.base)?;
+
+        // If this is a line link, base IS the coordinate
+        if let Entry::Coordinate(coord) = base_entry {
+            return Some(GqlCoordinate::new(coord.clone()));
+        }
+
+        // Otherwise, look up coordinate by order and position
+        let order = base_entry.order()?;
+        let position = base_entry.position()?;
+        self.graph.coordinate(order, position)
+            .map(|c| GqlCoordinate::new(c.clone()))
+    }
+
+    /// Target coordinate (for line links, returns the coordinate directly; for other links, looks up by position)
+    async fn target_coordinate(&self) -> Option<GqlCoordinate> {
+        let target_entry = self.graph.get_entry(&self.link.target)?;
+
+        // If this is a line link, target IS the coordinate
+        if let Entry::Coordinate(coord) = target_entry {
+            return Some(GqlCoordinate::new(coord.clone()));
+        }
+
+        // Otherwise, look up coordinate by order and position
+        let order = target_entry.order()?;
+        let position = target_entry.position()?;
+        self.graph.coordinate(order, position)
+            .map(|c| GqlCoordinate::new(c.clone()))
+    }
+
+    /// Base slice (term + coordinate + colour at base position)
+    async fn base_slice(&self) -> Option<GqlSlice> {
+        let base_entry = self.graph.get_entry(&self.link.base)?;
+        let order = base_entry.order()?;
+        let position = base_entry.position()?;
+        Some(GqlSlice::new(order, position, self.graph.clone()))
+    }
+
+    /// Target slice (term + coordinate + colour at target position)
+    async fn target_slice(&self) -> Option<GqlSlice> {
+        let target_entry = self.graph.get_entry(&self.link.target)?;
+        let order = target_entry.order()?;
+        let position = target_entry.position()?;
+        Some(GqlSlice::new(order, position, self.graph.clone()))
+    }
+
     /// Get the corresponding line link (for connectives) or connective (for lines)
     async fn corresponding_links(&self) -> Vec<GqlLink> {
         let base_pos = self.graph.get_entry(&self.link.base).and_then(|e| e.position());
@@ -800,6 +848,20 @@ impl GqlSystemView {
             .into_iter()
             .map(|l| GqlLink::new(l.clone(), &self.graph))
             .collect()
+    }
+
+    /// All links (both connectives and lines) for this system
+    async fn links(&self) -> Vec<GqlLink> {
+        let mut all_links: Vec<GqlLink> = self.graph.connectives(self.order, None, None)
+            .into_iter()
+            .map(|l| GqlLink::new(l.clone(), &self.graph))
+            .collect();
+        all_links.extend(
+            self.graph.lines(self.order)
+                .into_iter()
+                .map(|l| GqlLink::new(l.clone(), &self.graph))
+        );
+        all_links
     }
 
     /// Get slice at a specific position
