@@ -249,13 +249,13 @@ fn add_system_entries(graph: &mut Graph, order: u8) {
         let pos_idx = (position - 1) as usize;
         let index = get_index_for_position(order, position);
 
-        // Add term if character available
+        // Add term with index
         if pos_idx < term_chars.len() {
             let char_id = format!(
                 "char_canonical_{}",
                 term_chars[pos_idx].to_lowercase().replace(' ', "_")
             );
-            graph.add_entry(Entry::Term(Term::with_auto_id(order, position, &char_id)));
+            graph.add_entry(Entry::Term(Term::with_index(order, position, index, &char_id)));
         }
 
         // Add coordinate with index

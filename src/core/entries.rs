@@ -66,6 +66,8 @@ pub struct Term {
     pub order: u8,
     /// Position within the system (1 to order)
     pub position: u8,
+    /// Universal hyparchic index (1-12) - defaults to position if not set
+    pub index: Option<u8>,
     /// ID of the Character entry this term references
     pub character: String,
 }
@@ -81,6 +83,7 @@ impl Term {
             id: id.into(),
             order,
             position,
+            index: None,
             character: character.into(),
         }
     }
@@ -92,6 +95,19 @@ impl Term {
             id: format!("term_{}_{}", order, position),
             order,
             position,
+            index: None,
+            character,
+        }
+    }
+
+    /// Create a term with a specific universal index
+    pub fn with_index(order: u8, position: u8, index: u8, character: impl Into<String>) -> Self {
+        let character = character.into();
+        Self {
+            id: format!("term_{}_{}", order, position),
+            order,
+            position,
+            index: Some(index),
             character,
         }
     }

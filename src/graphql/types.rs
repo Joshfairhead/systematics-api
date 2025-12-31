@@ -580,7 +580,8 @@ impl GqlTerm {
     }
 
     async fn position(&self) -> i32 {
-        self.term.position as i32
+        // Return index if set, otherwise fall back to position
+        self.term.index.unwrap_or(self.term.position) as i32
     }
 
     async fn character_id(&self) -> &str {
@@ -623,11 +624,8 @@ impl GqlCoordinate {
     }
 
     async fn position(&self) -> i32 {
-        self.coordinate.position as i32
-    }
-
-    async fn index(&self) -> Option<i32> {
-        self.coordinate.index.map(|i| i as i32)
+        // Return index if set, otherwise fall back to position
+        self.coordinate.index.unwrap_or(self.coordinate.position) as i32
     }
 
     async fn x(&self) -> f64 {
@@ -665,11 +663,8 @@ impl GqlColour {
     }
 
     async fn position(&self) -> i32 {
-        self.colour.position as i32
-    }
-
-    async fn index(&self) -> Option<i32> {
-        self.colour.index.map(|i| i as i32)
+        // Return index if set, otherwise fall back to position
+        self.colour.index.unwrap_or(self.colour.position) as i32
     }
 
     async fn language(&self) -> GqlLanguage {
