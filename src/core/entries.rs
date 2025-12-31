@@ -105,6 +105,8 @@ pub struct Coordinate {
     pub order: u8,
     /// Position within the system (1 to order)
     pub position: u8,
+    /// Universal hyparchic index (1-12) - defaults to position if not set
+    pub index: Option<u8>,
     /// 3D coordinate value
     pub value: Point3d,
 }
@@ -115,6 +117,7 @@ impl Coordinate {
             id: id.into(),
             order,
             position,
+            index: None,
             value,
         }
     }
@@ -125,6 +128,18 @@ impl Coordinate {
             id: format!("coord_{}_{}", order, position),
             order,
             position,
+            index: None,
+            value,
+        }
+    }
+
+    /// Create a coordinate with a specific universal index
+    pub fn with_index(order: u8, position: u8, index: u8, value: Point3d) -> Self {
+        Self {
+            id: format!("coord_{}_{}", order, position),
+            order,
+            position,
+            index: Some(index),
             value,
         }
     }
@@ -138,6 +153,8 @@ pub struct Colour {
     pub order: u8,
     /// Position within the system (for position-specific colours)
     pub position: u8,
+    /// Universal hyparchic index (1-12) - defaults to position if not set
+    pub index: Option<u8>,
     /// Representation language (Hex or Name)
     pub language: Language,
     /// The color value (e.g., "#FF0000" or "Red")
@@ -156,6 +173,7 @@ impl Colour {
             id: id.into(),
             order,
             position,
+            index: None,
             language,
             value: value.into(),
         }
@@ -172,6 +190,25 @@ impl Colour {
             id: format!("colour_{}_{}_{}", order, position, language.to_string().to_lowercase()),
             order,
             position,
+            index: None,
+            language,
+            value: value.into(),
+        }
+    }
+
+    /// Create a colour with a specific universal index
+    pub fn with_index(
+        order: u8,
+        position: u8,
+        index: u8,
+        language: Language,
+        value: impl Into<String>,
+    ) -> Self {
+        Self {
+            id: format!("colour_{}_{}_{}", order, position, language.to_string().to_lowercase()),
+            order,
+            position,
+            index: Some(index),
             language,
             value: value.into(),
         }

@@ -213,6 +213,32 @@ fn add_canonical_characters(graph: &mut Graph) {
     }
 }
 
+/// Get the universal hyparchic index for a position in a system
+fn get_index_for_position(order: u8, position: u8) -> u8 {
+    match order {
+        // For orders 1-8, index = position (sequential)
+        1..=8 => position,
+        // Ennead: positions map to indices [1, 5, 3, 6, 2, 8, 4, 9, 7]
+        9 => match position {
+            1 => 1, 2 => 5, 3 => 3, 4 => 6, 5 => 2,
+            6 => 8, 7 => 4, 8 => 9, 9 => 7, _ => position,
+        },
+        // Decad: positions map to indices [5, 3, 6, 9, 2, 8, 4, 10, 7, 1]
+        10 => match position {
+            1 => 5, 2 => 3, 3 => 6, 4 => 9, 5 => 2,
+            6 => 8, 7 => 4, 8 => 10, 9 => 7, 10 => 1, _ => position,
+        },
+        // Undecad: positions map to indices [11, 3, 6, 9, 2, 8, 4, 10, 7, 1, 5]
+        11 => match position {
+            1 => 11, 2 => 3, 3 => 6, 4 => 9, 5 => 2, 6 => 8,
+            7 => 4, 8 => 10, 9 => 7, 10 => 1, 11 => 5, _ => position,
+        },
+        // Dodecad: sequential for now
+        12 => position,
+        _ => position,
+    }
+}
+
 /// Add entries for a specific system order
 fn add_system_entries(graph: &mut Graph, order: u8) {
     let term_chars = get_term_characters(order);
@@ -221,6 +247,7 @@ fn add_system_entries(graph: &mut Graph, order: u8) {
 
     for position in 1..=order {
         let pos_idx = (position - 1) as usize;
+        let index = get_index_for_position(order, position);
 
         // Add term if character available
         if pos_idx < term_chars.len() {
@@ -231,20 +258,22 @@ fn add_system_entries(graph: &mut Graph, order: u8) {
             graph.add_entry(Entry::Term(Term::with_auto_id(order, position, &char_id)));
         }
 
-        // Add coordinate
+        // Add coordinate with index
         if pos_idx < coords.len() {
-            graph.add_entry(Entry::Coordinate(Coordinate::with_auto_id(
+            graph.add_entry(Entry::Coordinate(Coordinate::with_index(
                 order,
                 position,
+                index,
                 coords[pos_idx],
             )));
         }
 
-        // Add colour (hex)
+        // Add colour with index
         if pos_idx < colours.len() {
-            graph.add_entry(Entry::Colour(Colour::with_auto_id(
+            graph.add_entry(Entry::Colour(Colour::with_index(
                 order,
                 position,
+                index,
                 Language::Hex,
                 colours[pos_idx],
             )));
