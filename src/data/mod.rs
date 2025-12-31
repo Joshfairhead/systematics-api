@@ -7,7 +7,6 @@ use crate::core::{
     Character, CoherenceAttribute, ConnectiveDesignation, Colour, Coordinate, Entry, Graph,
     Language, Link, Point3d, SystemName, Term, TermDesignation,
 };
-use std::f64::consts::PI;
 
 /// Build the complete graph with all systems (1-12)
 pub fn build_graph() -> Graph {
@@ -308,35 +307,236 @@ fn get_term_characters(order: u8) -> Vec<&'static str> {
     }
 }
 
-/// Get coordinates for an order (regular polygon vertices)
+/// Get coordinates for an order (from curated data files)
 fn get_coordinates(order: u8) -> Vec<Point3d> {
-    (0..order)
-        .map(|i| {
-            let angle = 2.0 * PI * (i as f64) / (order as f64) - PI / 2.0;
-            Point3d::new(angle.cos(), angle.sin(), 0.0)
-        })
-        .collect()
+    match order {
+        1 => vec![Point3d::new(0.0, 0.0, 0.0)],
+        2 => vec![
+            Point3d::new(-1.0, 0.0, 0.0),  // Essence (left)
+            Point3d::new(1.0, 0.0, 0.0),   // Existence (right)
+        ],
+        3 => vec![
+            Point3d::new(0.0, 1.0, 0.0),   // Will (top left)
+            Point3d::new(0.0, -1.0, 0.0),  // Function (bottom left)
+            Point3d::new(1.0, 0.0, 0.0),   // Being (right, midpoint vertically)
+        ],
+        4 => vec![
+            Point3d::new(0.0, 1.0, 0.0),   // Ideal (top)
+            Point3d::new(0.0, -1.0, 0.0),  // Ground (bottom)
+            Point3d::new(1.0, 0.0, 0.0),   // Directive (right)
+            Point3d::new(-1.0, 0.0, 0.0),  // Instrumental (left)
+        ],
+        5 => vec![
+            Point3d::new(-0.75, 0.0, 0.0),   // Quintessence (left-center, middle)
+            Point3d::new(1.0, -0.75, 0.0),   // Source (right, bottom)
+            Point3d::new(0.0, 0.5, 0.0),     // Higher Potential (center, upper)
+            Point3d::new(0.0, -0.5, 0.0),    // Lower Potential (center, lower)
+            Point3d::new(1.0, 0.75, 0.0),    // Purpose (right, top)
+        ],
+        6 => vec![
+            Point3d::new(-0.866, -0.5, 0.0),   // Priorities (lower left)
+            Point3d::new(0.866, -0.5, 0.0),    // Criteria (lower right)
+            Point3d::new(0.0, 1.0, 0.0),       // Values (top)
+            Point3d::new(-0.866, 0.5, 0.0),    // Resources (upper left)
+            Point3d::new(0.866, 0.5, 0.0),     // Options (upper right)
+            Point3d::new(0.0, -1.0, 0.0),      // Facts (bottom)
+        ],
+        7 => vec![
+            Point3d::new(0.0, 1.0, 0.0),              // Insight (top center)
+            Point3d::new(-0.433884, -0.900969, 0.0),  // Application
+            Point3d::new(0.974370, -0.222521, 0.0),   // Design
+            Point3d::new(0.781831, 0.623489, 0.0),    // Research
+            Point3d::new(0.433884, -0.900969, 0.0),   // Synthesis
+            Point3d::new(-0.974370, -0.222521, 0.0),  // Delivery
+            Point3d::new(-0.781831, 0.623489, 0.0),   // Value
+        ],
+        8 => vec![
+            Point3d::new(-0.70710678118, 0.70710678118, 0.0),   // Inherent Values (upper left)
+            Point3d::new(0.70710678118, -0.70710678118, 0.0),   // Critical Functions (lower right)
+            Point3d::new(0.70710678118, 0.70710678118, 0.0),    // Organisational Modes (upper right)
+            Point3d::new(-0.70710678118, -0.70710678118, 0.0),  // Necessary Resourcing (lower left)
+            Point3d::new(0.0, 1.0, 0.0),                        // Intrinsic Nature (top)
+            Point3d::new(1.0, 0.0, 0.0),                        // Smallest Significant Holon (right)
+            Point3d::new(-1.0, 0.0, 0.0),                       // Integrative Totality (left)
+            Point3d::new(0.0, -1.0, 0.0),                       // Supportive Platform (bottom)
+        ],
+        9 => vec![
+            Point3d::new(0.64278760968, 0.76604444311, 0.0),
+            Point3d::new(0.98480775301, 0.17364817767, 0.0),
+            Point3d::new(0.86602540378, -0.5, 0.0),
+            Point3d::new(0.34202014333, -0.93969262079, 0.0),
+            Point3d::new(-0.34202014333, -0.93969262079, 0.0),
+            Point3d::new(-0.86602540378, -0.5, 0.0),
+            Point3d::new(-0.98480775301, 0.17364817767, 0.0),
+            Point3d::new(-0.64278760968, 0.76604444311, 0.0),
+            Point3d::new(0.0, 1.0, 0.0),
+        ],
+        10 => vec![
+            Point3d::new(-0.30901699437, 0.95105651630, 0.0),
+            Point3d::new(0.30901699437, 0.95105651630, 0.0),
+            Point3d::new(0.80901699437, 0.58778525229, 0.0),
+            Point3d::new(1.0, 0.0, 0.0),
+            Point3d::new(0.80901699437, -0.58778525229, 0.0),
+            Point3d::new(0.30901699437, -0.95105651630, 0.0),
+            Point3d::new(-0.30901699437, -0.95105651630, 0.0),
+            Point3d::new(-0.80901699437, -0.58778525229, 0.0),
+            Point3d::new(-1.0, 0.0, 0.0),
+            Point3d::new(-0.80901699437, 0.58778525229, 0.0),
+        ],
+        11 => vec![
+            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(0.54064081745, 0.84125353283, 0.0),
+            Point3d::new(0.909632, 0.415415, 0.0),
+            Point3d::new(0.989821, -0.142315, 0.0),
+            Point3d::new(0.755750, -0.654861, 0.0),
+            Point3d::new(0.281733, -0.959493, 0.0),
+            Point3d::new(-0.281733, -0.959493, 0.0),
+            Point3d::new(-0.755750, -0.654861, 0.0),
+            Point3d::new(-0.989821, -0.142315, 0.0),
+            Point3d::new(-0.909632, 0.415415, 0.0),
+            Point3d::new(-0.54064081745, 0.84125353283, 0.0),
+        ],
+        12 => vec![
+            Point3d::new(0.86602540378, -0.5, 0.0),      // Wholeness
+            Point3d::new(-0.5, -0.86602540378, 0.0),     // Polarity
+            Point3d::new(0.5, -0.86602540378, 0.0),      // Relatedness
+            Point3d::new(0.0, -1.0, 0.0),                // Subsistence
+            Point3d::new(-0.86602540378, -0.5, 0.0),     // Potentiality
+            Point3d::new(-1.0, 0.0, 0.0),                // Repetition
+            Point3d::new(1.0, 0.0, 0.0),                 // Structure
+            Point3d::new(0.86602540378, 0.5, 0.0),       // Individuality
+            Point3d::new(-0.86602540378, 0.5, 0.0),      // Pattern
+            Point3d::new(0.5, 0.86602540378, 0.0),       // Creativity
+            Point3d::new(-0.5, 0.86602540378, 0.0),      // Domination
+            Point3d::new(0.0, 1.0, 0.0),                 // Autocracy
+        ],
+        _ => vec![],
+    }
 }
 
 /// Get position colours for an order
+/// Maps positions to their universal hyparchic color index
 fn get_colours(order: u8) -> Vec<&'static str> {
-    // Standard position colours
-    let all_colours = [
-        "#FF0000", // Red (position 1)
-        "#0000FF", // Blue (position 2)
-        "#E6E600", // Yellow (position 3)
-        "#00FF00", // Green (position 4)
-        "#FF00FF", // Magenta (position 5)
-        "#00FFFF", // Cyan (position 6)
-        "#FF8000", // Orange (position 7)
-        "#8000FF", // Purple (position 8)
-        "#FF0080", // Pink (position 9)
-        "#80FF00", // Lime (position 10)
-        "#0080FF", // Sky Blue (position 11)
-        "#FFFFFF", // White (position 12)
+    // Universal hyparchic color palette (by index)
+    let hyparchic_colors = [
+        "#FF0000", // Index 1: Red
+        "#0000FF", // Index 2: Blue
+        "#FFFF00", // Index 3: Yellow
+        "#099902", // Index 4: Green
+        "#9900FF", // Index 5: Purple
+        "#FFA500", // Index 6: Orange
+        "#00FFFF", // Index 7: Light Blue/Cyan
+        "#8B4513", // Index 8: Brown
+        "#FF00FF", // Index 9: Magenta
+        "#FFFFFF", // Index 10: White
+        "#C0C0C0", // Index 11: Grey/Silver
+        "#FFD700", // Index 12: Bright Orange/Gold
     ];
 
-    all_colours[0..(order as usize).min(12)].to_vec()
+    // Position-to-index mappings for each system
+    match order {
+        1 => vec![hyparchic_colors[0]], // Monad: position 1 → index 1 (red)
+        2 => vec![
+            hyparchic_colors[0], // Position 1 (Essence) → index 1 (red)
+            hyparchic_colors[1], // Position 2 (Existence) → index 2 (blue)
+        ],
+        3 => vec![
+            hyparchic_colors[0], // Position 1 (Will) → index 1 (red)
+            hyparchic_colors[1], // Position 2 (Function) → index 2 (blue)
+            hyparchic_colors[2], // Position 3 (Being) → index 3 (yellow)
+        ],
+        4 => vec![
+            hyparchic_colors[0], // Position 1 (Ideal) → index 1 (red)
+            hyparchic_colors[1], // Position 2 (Ground) → index 2 (blue)
+            hyparchic_colors[2], // Position 3 (Directive) → index 3 (yellow)
+            hyparchic_colors[3], // Position 4 (Instrumental) → index 4 (green)
+        ],
+        5 => vec![
+            hyparchic_colors[0], // Position 1 (Quintessence) → index 1 (red)
+            hyparchic_colors[1], // Position 2 (Source) → index 2 (blue)
+            hyparchic_colors[2], // Position 3 (Higher Potential) → index 3 (yellow)
+            hyparchic_colors[3], // Position 4 (Lower Potential) → index 4 (green)
+            hyparchic_colors[4], // Position 5 (Purpose) → index 5 (purple)
+        ],
+        6 => vec![
+            hyparchic_colors[0], // Position 1 (Priorities) → index 1 (red)
+            hyparchic_colors[1], // Position 2 (Criteria) → index 2 (blue)
+            hyparchic_colors[2], // Position 3 (Values) → index 3 (yellow)
+            hyparchic_colors[3], // Position 4 (Resources) → index 4 (green)
+            hyparchic_colors[4], // Position 5 (Options) → index 5 (purple)
+            hyparchic_colors[5], // Position 6 (Facts) → index 6 (orange)
+        ],
+        7 => vec![
+            hyparchic_colors[0], // Position 1 (Insight) → index 1 (red)
+            hyparchic_colors[1], // Position 2 (Application) → index 2 (blue)
+            hyparchic_colors[2], // Position 3 (Design) → index 3 (yellow)
+            hyparchic_colors[3], // Position 4 (Research) → index 4 (green)
+            hyparchic_colors[4], // Position 5 (Synthesis) → index 5 (purple)
+            hyparchic_colors[5], // Position 6 (Delivery) → index 6 (orange)
+            hyparchic_colors[6], // Position 7 (Value) → index 7 (light blue)
+        ],
+        8 => vec![
+            hyparchic_colors[0], // Position 1 (Inherent Values) → index 1 (red)
+            hyparchic_colors[1], // Position 2 (Critical Functions) → index 2 (blue)
+            hyparchic_colors[2], // Position 3 (Organisational Modes) → index 3 (yellow)
+            hyparchic_colors[3], // Position 4 (Necessary Resourcing) → index 4 (green)
+            hyparchic_colors[4], // Position 5 (Intrinsic Nature) → index 5 (purple)
+            hyparchic_colors[5], // Position 6 (Smallest Significant Holon) → index 6 (orange)
+            hyparchic_colors[6], // Position 7 (Integrative Totality) → index 7 (light blue)
+            hyparchic_colors[7], // Position 8 (Supportive Platform) → index 8 (brown)
+        ],
+        9 => vec![
+            hyparchic_colors[0], // Position 1 (left of 12 o'clock) → index 1 (red)
+            hyparchic_colors[4], // Position 2 (12 o'clock) → index 5 (purple)
+            hyparchic_colors[2], // Position 3 → index 3 (yellow)
+            hyparchic_colors[5], // Position 4 → index 6 (orange)
+            hyparchic_colors[1], // Position 5 → index 2 (blue)
+            hyparchic_colors[7], // Position 6 → index 8 (brown)
+            hyparchic_colors[3], // Position 7 → index 4 (green)
+            hyparchic_colors[8], // Position 8 → index 9 (pink)
+            hyparchic_colors[6], // Position 9 → index 7 (light blue)
+        ],
+        10 => vec![
+            hyparchic_colors[4], // Position 1 (left topmost) → index 5 (purple)
+            hyparchic_colors[2], // Position 2 → index 3 (yellow)
+            hyparchic_colors[5], // Position 3 → index 6 (orange)
+            hyparchic_colors[8], // Position 4 → index 9 (pink)
+            hyparchic_colors[1], // Position 5 → index 2 (blue)
+            hyparchic_colors[7], // Position 6 → index 8 (brown)
+            hyparchic_colors[3], // Position 7 → index 4 (green)
+            hyparchic_colors[9], // Position 8 → index 10 (white)
+            hyparchic_colors[6], // Position 9 → index 7 (light blue)
+            hyparchic_colors[0], // Position 10 → index 1 (red)
+        ],
+        11 => vec![
+            hyparchic_colors[0],  // Position 1 → index 1 (red)
+            hyparchic_colors[1],  // Position 2 → index 2 (blue)
+            hyparchic_colors[2],  // Position 3 → index 3 (yellow)
+            hyparchic_colors[3],  // Position 4 → index 4 (green)
+            hyparchic_colors[4],  // Position 5 → index 5 (purple)
+            hyparchic_colors[5],  // Position 6 → index 6 (orange)
+            hyparchic_colors[6],  // Position 7 → index 7 (light blue)
+            hyparchic_colors[7],  // Position 8 → index 8 (brown)
+            hyparchic_colors[8],  // Position 9 → index 9 (pink)
+            hyparchic_colors[9],  // Position 10 → index 10 (white)
+            hyparchic_colors[10], // Position 11 → index 11 (grey/silver)
+        ],
+        12 => vec![
+            hyparchic_colors[0],  // Position 1 → index 1 (red)
+            hyparchic_colors[1],  // Position 2 → index 2 (blue)
+            hyparchic_colors[2],  // Position 3 → index 3 (yellow)
+            hyparchic_colors[3],  // Position 4 → index 4 (green)
+            hyparchic_colors[4],  // Position 5 → index 5 (purple)
+            hyparchic_colors[5],  // Position 6 → index 6 (orange)
+            hyparchic_colors[6],  // Position 7 → index 7 (light blue)
+            hyparchic_colors[7],  // Position 8 → index 8 (brown)
+            hyparchic_colors[8],  // Position 9 → index 9 (pink)
+            hyparchic_colors[9],  // Position 10 → index 10 (white)
+            hyparchic_colors[10], // Position 11 → index 11 (grey/silver)
+            hyparchic_colors[11], // Position 12 → index 12 (bright orange/gold)
+        ],
+        _ => vec![],
+    }
 }
 
 /// Add links (connectives and lines) for a system
