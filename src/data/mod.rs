@@ -202,6 +202,15 @@ fn add_canonical_characters(graph: &mut Graph) {
             &value,
         )));
     }
+
+    // Index-based terms for orders 9-12
+    for i in 1..=12 {
+        let value = format!("Index {}", i);
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            &value,
+        )));
+    }
 }
 
 /// Add entries for a specific system order
@@ -287,17 +296,15 @@ fn get_term_characters(order: u8) -> Vec<&'static str> {
             "Intrinsic Nature",
             "Organisational Modes",
         ],
-        // For orders 9-12, use generic terms
+        // For orders 9-12, use index-based terms
         9 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8", "Term 9",
+            "Index 1", "Index 5", "Index 3", "Index 6", "Index 2", "Index 8", "Index 4", "Index 9", "Index 7",
         ],
         10 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8", "Term 9",
-            "Term 10",
+            "Index 5", "Index 3", "Index 6", "Index 9", "Index 2", "Index 8", "Index 4", "Index 10", "Index 7", "Index 1",
         ],
         11 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8", "Term 9",
-            "Term 10", "Term 11",
+            "Index 11", "Index 3", "Index 6", "Index 9", "Index 2", "Index 8", "Index 4", "Index 10", "Index 7", "Index 1", "Index 5",
         ],
         12 => vec![
             "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8", "Term 9",
