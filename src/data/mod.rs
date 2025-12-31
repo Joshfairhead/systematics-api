@@ -509,17 +509,17 @@ fn get_colours(order: u8) -> Vec<&'static str> {
             hyparchic_colors[0], // Position 10 → index 1 (red)
         ],
         11 => vec![
-            hyparchic_colors[0],  // Position 1 → index 1 (red)
-            hyparchic_colors[1],  // Position 2 → index 2 (blue)
-            hyparchic_colors[2],  // Position 3 → index 3 (yellow)
-            hyparchic_colors[3],  // Position 4 → index 4 (green)
-            hyparchic_colors[4],  // Position 5 → index 5 (purple)
-            hyparchic_colors[5],  // Position 6 → index 6 (orange)
-            hyparchic_colors[6],  // Position 7 → index 7 (light blue)
-            hyparchic_colors[7],  // Position 8 → index 8 (brown)
-            hyparchic_colors[8],  // Position 9 → index 9 (pink)
-            hyparchic_colors[9],  // Position 10 → index 10 (white)
-            hyparchic_colors[10], // Position 11 → index 11 (grey/silver)
+            hyparchic_colors[10], // Position 1 (top, clockwise start) → index 11 (grey/silver)
+            hyparchic_colors[2],  // Position 2 → index 3 (yellow)
+            hyparchic_colors[5],  // Position 3 → index 6 (orange)
+            hyparchic_colors[8],  // Position 4 → index 9 (magenta)
+            hyparchic_colors[1],  // Position 5 → index 2 (blue)
+            hyparchic_colors[7],  // Position 6 → index 8 (brown)
+            hyparchic_colors[3],  // Position 7 → index 4 (green)
+            hyparchic_colors[9],  // Position 8 → index 10 (white)
+            hyparchic_colors[6],  // Position 9 → index 7 (light blue)
+            hyparchic_colors[0],  // Position 10 → index 1 (red)
+            hyparchic_colors[4],  // Position 11 → index 5 (purple)
         ],
         12 => vec![
             hyparchic_colors[0],  // Position 1 → index 1 (red)
