@@ -1,6 +1,7 @@
 use crate::core::fiber::Fiber;
 use crate::core::system_content::SystemContent;
 use crate::core::system_topology::SystemTopology;
+use crate::core::views::SystemView;
 use crate::core::Index;
 use std::fmt;
 
@@ -226,6 +227,60 @@ impl<T: SystemContent> System<T> {
     }
 }
 
+// ============================================================================
+// Conversion from SystemView
+// ============================================================================
+
+impl System<String> {
+    /// Create a System from a SystemView.
+    ///
+    /// Converts each FiberView to a Fiber<String> and uses complete graph connectivity.
+    ///
+    /// Returns Err if conversion fails (e.g., empty fibers).
+    pub fn try_from_view(view: &SystemView) -> Result<Self, SystemError> {
+        if view.fibers.is_empty() {
+            return Err(SystemError::InvalidFiberCount(
+                "SystemView has no fibers".to_string(),
+            ));
+        }
+
+        // Convert each FiberView to Fiber<String>
+        let fibers: Vec<Fiber<String>> = view
+            .fibers
+            .iter()
+            .filter_map(|fv| Fiber::try_from_view(fv))
+            .collect();
+
+        if fibers.len() != view.fibers.len() {
+            return Err(SystemError::InvalidFiberCount(
+                "Some fibers failed to convert".to_string(),
+            ));
+        }
+
+        // Generate connectivity from the simplex edges
+        let order = view.order.value() as usize;
+        let mut connectivity = vec![vec![false; order]; order];
+
+        // Complete graph connectivity from simplex edges
+        for (from, to) in &view.simplex.edges {
+            let from_idx = from.to_zero_based();
+            let to_idx = to.to_zero_based();
+            if from_idx < order && to_idx < order {
+                connectivity[from_idx][to_idx] = true;
+                connectivity[to_idx][from_idx] = true;
+            }
+        }
+
+        Ok(System { fibers, connectivity })
+    }
+
+    /// Create a System from a SystemView.
+    /// Panics if conversion fails.
+    pub fn from_view(view: &SystemView) -> Self {
+        Self::try_from_view(view).expect("SystemView should be valid")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -325,5 +380,46 @@ mod tests {
 
         let connections = system.connections(idx1).unwrap();
         assert_eq!(connections.len(), 2); // Connected to 2 and 3
+    }
+
+    #[test]
+    fn test_system_from_view() {
+        use crate::core::generators::generate_system;
+
+        let view = generate_system(Index::Three);
+        let system = System::from_view(&view);
+
+        assert_eq!(system.order(), 3);
+        assert_eq!(system.fibers().len(), 3);
+
+        // Check connectivity matches complete graph K3
+        assert!(system.is_connected(Index::One, Index::Two).unwrap());
+        assert!(system.is_connected(Index::One, Index::Three).unwrap());
+        assert!(system.is_connected(Index::Two, Index::Three).unwrap());
+    }
+
+    #[test]
+    fn test_system_try_from_view() {
+        use crate::core::generators::generate_system;
+
+        let view = generate_system(Index::Four);
+        let result = System::try_from_view(&view);
+
+        assert!(result.is_ok());
+        let system = result.unwrap();
+        assert_eq!(system.order(), 4);
+    }
+
+    #[test]
+    fn test_system_from_view_preserves_fibers() {
+        use crate::core::generators::generate_system;
+
+        let view = generate_system(Index::Three);
+        let system = System::from_view(&view);
+
+        // Check that each fiber has expected content
+        for fiber in system.fibers() {
+            assert!(!fiber.content().is_empty());
+        }
     }
 }
