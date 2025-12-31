@@ -422,6 +422,61 @@ impl GqlLink {
             .and_then(|id| self.graph.get_character(id))
             .map(|c| GqlCharacter::new(c.clone()))
     }
+
+    /// Order of this link (derived from base entry)
+    async fn order(&self) -> Option<i32> {
+        self.graph.get_entry(&self.link.base)
+            .and_then(|e| e.order())
+            .map(|o| o as i32)
+    }
+
+    /// Base position (derived from base entry)
+    async fn base_position(&self) -> Option<i32> {
+        self.graph.get_entry(&self.link.base)
+            .and_then(|e| e.position())
+            .map(|p| p as i32)
+    }
+
+    /// Target position (derived from target entry)
+    async fn target_position(&self) -> Option<i32> {
+        self.graph.get_entry(&self.link.target)
+            .and_then(|e| e.position())
+            .map(|p| p as i32)
+    }
+
+    /// Get the corresponding line link (for connectives) or connective (for lines)
+    async fn corresponding_links(&self) -> Vec<GqlLink> {
+        let base_pos = self.graph.get_entry(&self.link.base).and_then(|e| e.position());
+        let target_pos = self.graph.get_entry(&self.link.target).and_then(|e| e.position());
+        let order = self.graph.get_entry(&self.link.base).and_then(|e| e.order());
+
+        match (order, base_pos, target_pos) {
+            (Some(ord), Some(bp), Some(tp)) => {
+                self.graph.links.iter()
+                    .filter(|l| {
+                        // Skip self
+                        if l.id == self.link.id {
+                            return false;
+                        }
+                        // Check if this link connects the same positions
+                        let l_base = self.graph.get_entry(&l.base);
+                        let l_target = self.graph.get_entry(&l.target);
+                        match (l_base, l_target) {
+                            (Some(lb), Some(lt)) => {
+                                lb.order() == Some(ord) &&
+                                lt.order() == Some(ord) &&
+                                ((lb.position() == Some(bp) && lt.position() == Some(tp)) ||
+                                 (lb.position() == Some(tp) && lt.position() == Some(bp)))
+                            }
+                            _ => false
+                        }
+                    })
+                    .map(|l| GqlLink::new(l.clone(), &self.graph))
+                    .collect()
+            }
+            _ => vec![]
+        }
+    }
 }
 
 // ============================================================================
