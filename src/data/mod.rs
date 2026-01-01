@@ -213,31 +213,6 @@ fn add_canonical_characters(graph: &mut Graph) {
     }
 }
 
-/// Get the universal hyparchic index for a position in a system
-fn get_index_for_position(order: u8, position: u8) -> u8 {
-    match order {
-        // For orders 1-8, index = position (sequential)
-        1..=8 => position,
-        // Ennead: positions map to indices [1, 5, 3, 6, 2, 8, 4, 9, 7]
-        9 => match position {
-            1 => 1, 2 => 5, 3 => 3, 4 => 6, 5 => 2,
-            6 => 8, 7 => 4, 8 => 9, 9 => 7, _ => position,
-        },
-        // Decad: positions map to indices [5, 3, 6, 9, 2, 8, 4, 10, 7, 1]
-        10 => match position {
-            1 => 5, 2 => 3, 3 => 6, 4 => 9, 5 => 2,
-            6 => 8, 7 => 4, 8 => 10, 9 => 7, 10 => 1, _ => position,
-        },
-        // Undecad: positions map to indices [11, 3, 6, 9, 2, 8, 4, 10, 7, 1, 5]
-        11 => match position {
-            1 => 11, 2 => 3, 3 => 6, 4 => 9, 5 => 2, 6 => 8,
-            7 => 4, 8 => 10, 9 => 7, 10 => 1, 11 => 5, _ => position,
-        },
-        // Dodecad: sequential for now
-        12 => position,
-        _ => position,
-    }
-}
 
 /// Add entries for a specific system order
 fn add_system_entries(graph: &mut Graph, order: u8) {
@@ -247,33 +222,30 @@ fn add_system_entries(graph: &mut Graph, order: u8) {
 
     for position in 1..=order {
         let pos_idx = (position - 1) as usize;
-        let index = get_index_for_position(order, position);
 
-        // Add term with index
+        // Add term
         if pos_idx < term_chars.len() {
             let char_id = format!(
                 "char_canonical_{}",
                 term_chars[pos_idx].to_lowercase().replace(' ', "_")
             );
-            graph.add_entry(Entry::Term(Term::with_index(order, position, index, &char_id)));
+            graph.add_entry(Entry::Term(Term::with_auto_id(order, position, &char_id)));
         }
 
-        // Add coordinate with index
+        // Add coordinate
         if pos_idx < coords.len() {
-            graph.add_entry(Entry::Coordinate(Coordinate::with_index(
+            graph.add_entry(Entry::Coordinate(Coordinate::with_auto_id(
                 order,
                 position,
-                index,
                 coords[pos_idx],
             )));
         }
 
-        // Add colour with index
+        // Add colour
         if pos_idx < colours.len() {
-            graph.add_entry(Entry::Colour(Colour::with_index(
+            graph.add_entry(Entry::Colour(Colour::with_auto_id(
                 order,
                 position,
-                index,
                 Language::Hex,
                 colours[pos_idx],
             )));
@@ -335,9 +307,10 @@ fn get_term_characters(order: u8) -> Vec<&'static str> {
         11 => vec![
             "Index 11", "Index 3", "Index 6", "Index 9", "Index 2", "Index 8", "Index 4", "Index 10", "Index 7", "Index 1", "Index 5",
         ],
+        // Dodecad: clockwise from 12 o'clock: 9, 6, 3, 5, 2, 10, 7, 8, 4, 11, 12, 1
         12 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8", "Term 9",
-            "Term 10", "Term 11", "Term 12",
+            "Index 9", "Index 6", "Index 3", "Index 5", "Index 2", "Index 10",
+            "Index 7", "Index 8", "Index 4", "Index 11", "Index 12", "Index 1",
         ],
         _ => vec![],
     }
@@ -557,19 +530,20 @@ fn get_colours(order: u8) -> Vec<&'static str> {
             hyparchic_colors[0],  // Position 10 → index 1 (red)
             hyparchic_colors[4],  // Position 11 → index 5 (purple)
         ],
+        // Dodecad: clockwise from 12 o'clock: 9, 6, 3, 5, 2, 10, 7, 8, 4, 11, 12, 1
         12 => vec![
-            hyparchic_colors[0],  // Position 1 → index 1 (red)
-            hyparchic_colors[1],  // Position 2 → index 2 (blue)
+            hyparchic_colors[8],  // Position 1 → index 9 (magenta)
+            hyparchic_colors[5],  // Position 2 → index 6 (orange)
             hyparchic_colors[2],  // Position 3 → index 3 (yellow)
-            hyparchic_colors[3],  // Position 4 → index 4 (green)
-            hyparchic_colors[4],  // Position 5 → index 5 (purple)
-            hyparchic_colors[5],  // Position 6 → index 6 (orange)
+            hyparchic_colors[4],  // Position 4 → index 5 (purple)
+            hyparchic_colors[1],  // Position 5 → index 2 (blue)
+            hyparchic_colors[9],  // Position 6 → index 10 (white)
             hyparchic_colors[6],  // Position 7 → index 7 (light blue)
             hyparchic_colors[7],  // Position 8 → index 8 (brown)
-            hyparchic_colors[8],  // Position 9 → index 9 (pink)
-            hyparchic_colors[9],  // Position 10 → index 10 (white)
-            hyparchic_colors[10], // Position 11 → index 11 (grey/silver)
-            hyparchic_colors[11], // Position 12 → index 12 (bright orange/gold)
+            hyparchic_colors[3],  // Position 9 → index 4 (green)
+            hyparchic_colors[10], // Position 10 → index 11 (silver)
+            hyparchic_colors[11], // Position 11 → index 12 (gold)
+            hyparchic_colors[0],  // Position 12 → index 1 (red)
         ],
         _ => vec![],
     }
