@@ -214,40 +214,56 @@ fn add_canonical_characters(graph: &mut Graph) {
 }
 
 
+/// Get position sequence for orders 9-12 (position = term number)
+/// For orders 1-8, positions are sequential 1..=order
+fn get_position_sequence(order: u8) -> Vec<u8> {
+    match order {
+        // Ennead: positions clockwise from top-right
+        9 => vec![5, 3, 6, 2, 8, 4, 9, 7, 1],
+        // Decad: positions clockwise from top-left
+        10 => vec![5, 3, 6, 9, 2, 8, 4, 10, 7, 1],
+        // Undecad: positions clockwise from 12 o'clock
+        11 => vec![11, 3, 6, 9, 2, 8, 4, 10, 7, 1, 5],
+        // Dodecad: positions clockwise from 12 o'clock
+        12 => vec![9, 6, 3, 5, 2, 10, 7, 8, 4, 11, 12, 1],
+        // For orders 1-8, sequential positions
+        _ => (1..=order).collect(),
+    }
+}
+
 /// Add entries for a specific system order
 fn add_system_entries(graph: &mut Graph, order: u8) {
     let term_chars = get_term_characters(order);
     let coords = get_coordinates(order);
     let colours = get_colours(order);
+    let positions = get_position_sequence(order);
 
-    for position in 1..=order {
-        let pos_idx = (position - 1) as usize;
-
-        // Add term
-        if pos_idx < term_chars.len() {
+    for (idx, &position) in positions.iter().enumerate() {
+        // Add term - position matches term number for orders 9-12
+        if idx < term_chars.len() {
             let char_id = format!(
                 "char_canonical_{}",
-                term_chars[pos_idx].to_lowercase().replace(' ', "_")
+                term_chars[idx].to_lowercase().replace(' ', "_")
             );
             graph.add_entry(Entry::Term(Term::with_auto_id(order, position, &char_id)));
         }
 
         // Add coordinate
-        if pos_idx < coords.len() {
+        if idx < coords.len() {
             graph.add_entry(Entry::Coordinate(Coordinate::with_auto_id(
                 order,
                 position,
-                coords[pos_idx],
+                coords[idx],
             )));
         }
 
         // Add colour
-        if pos_idx < colours.len() {
+        if idx < colours.len() {
             graph.add_entry(Entry::Colour(Colour::with_auto_id(
                 order,
                 position,
                 Language::Hex,
-                colours[pos_idx],
+                colours[idx],
             )));
         }
     }
@@ -262,55 +278,63 @@ fn get_term_characters(order: u8) -> Vec<&'static str> {
         1 => vec!["Unity"],
         2 => vec!["Essence", "Existence"],
         3 => vec!["Will", "Function", "Being"],
-        4 => vec!["Ideal", "Directive", "Instrumental", "Ground"],
+        4 => vec!["Ideal", "Ground", "Directive", "Instrumental"],
+        // Pentad: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
         5 => vec![
-            "Purpose",
-            "Higher Potential",
             "Quintessence",
-            "Lower Potential",
             "Source",
+            "Higher Potential",
+            "Lower Potential",
+            "Purpose",
         ],
+        // Hexad: 1=Priorities, 2=Criteria, 3=Values, 4=Resources, 5=Options, 6=Facts
         6 => vec![
-            "Resources",
-            "Values",
-            "Options",
-            "Criteria",
-            "Facts",
             "Priorities",
+            "Criteria",
+            "Values",
+            "Resources",
+            "Options",
+            "Facts",
         ],
+        // Heptad: 1=Insight, 2=Application, 3=Design, 4=Research, 5=Synthesis, 6=Delivery, 7=Value
         7 => vec![
             "Insight",
-            "Research",
-            "Design",
-            "Synthesis",
             "Application",
+            "Design",
+            "Research",
+            "Synthesis",
             "Delivery",
             "Value",
         ],
+        // Octad: Position N = Term mapping
+        // 1=Inherent Values, 2=Critical Functions, 3=Organisational Modes, 4=Necessary Resourcing
+        // 5=Intrinsic Nature, 6=Smallest Holon, 7=Integrative Totality, 8=Supportive Platform
         8 => vec![
-            "Smallest Significant Holon",
-            "Critical Functions",
-            "Supportive Platform",
-            "Necessary Resourcing",
-            "Integrative Totality",
             "Inherent Values",
-            "Intrinsic Nature",
+            "Critical Functions",
             "Organisational Modes",
+            "Necessary Resourcing",
+            "Intrinsic Nature",
+            "Smallest Significant Holon",
+            "Integrative Totality",
+            "Supportive Platform",
         ],
-        // For orders 9-12, use index-based terms
+        // Ennead: Term N at Position N, sequence: 5, 3, 6, 2, 8, 4, 9, 7, 1
         9 => vec![
-            "Index 1", "Index 5", "Index 3", "Index 6", "Index 2", "Index 8", "Index 4", "Index 9", "Index 7",
+            "Term 5", "Term 3", "Term 6", "Term 2", "Term 8", "Term 4", "Term 9", "Term 7", "Term 1",
         ],
+        // Decad: Term N at Position N, sequence: 5, 3, 6, 9, 2, 8, 4, 10, 7, 1
         10 => vec![
-            "Index 5", "Index 3", "Index 6", "Index 9", "Index 2", "Index 8", "Index 4", "Index 10", "Index 7", "Index 1",
+            "Term 5", "Term 3", "Term 6", "Term 9", "Term 2", "Term 8", "Term 4", "Term 10", "Term 7", "Term 1",
         ],
+        // Undecad: Term N at Position N, sequence: 11, 3, 6, 9, 2, 8, 4, 10, 7, 1, 5
         11 => vec![
-            "Index 11", "Index 3", "Index 6", "Index 9", "Index 2", "Index 8", "Index 4", "Index 10", "Index 7", "Index 1", "Index 5",
+            "Term 11", "Term 3", "Term 6", "Term 9", "Term 2", "Term 8", "Term 4", "Term 10", "Term 7", "Term 1", "Term 5",
         ],
-        // Dodecad: clockwise from 12 o'clock: 9, 6, 3, 5, 2, 10, 7, 8, 4, 11, 12, 1
+        // Dodecad: Term N at Position N, sequence: 9, 6, 3, 5, 2, 10, 7, 8, 4, 11, 12, 1
         12 => vec![
-            "Index 9", "Index 6", "Index 3", "Index 5", "Index 2", "Index 10",
-            "Index 7", "Index 8", "Index 4", "Index 11", "Index 12", "Index 1",
+            "Term 9", "Term 6", "Term 3", "Term 5", "Term 2", "Term 10",
+            "Term 7", "Term 8", "Term 4", "Term 11", "Term 12", "Term 1",
         ],
         _ => vec![],
     }
@@ -369,182 +393,100 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(-1.0, 0.0, 0.0),                       // Integrative Totality (left)
             Point3d::new(0.0, -1.0, 0.0),                       // Supportive Platform (bottom)
         ],
+        // Ennead: 9 points clockwise from 12 o'clock
+        // Sequence: 5, 3, 6, 2, 8, 4, 9, 7, 1
         9 => vec![
-            Point3d::new(0.64278760968, 0.76604444311, 0.0),
-            Point3d::new(0.98480775301, 0.17364817767, 0.0),
-            Point3d::new(0.86602540378, -0.5, 0.0),
-            Point3d::new(0.34202014333, -0.93969262079, 0.0),
-            Point3d::new(-0.34202014333, -0.93969262079, 0.0),
-            Point3d::new(-0.86602540378, -0.5, 0.0),
-            Point3d::new(-0.98480775301, 0.17364817767, 0.0),
-            Point3d::new(-0.64278760968, 0.76604444311, 0.0),
-            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(0.0, 1.0, 0.0),                       // Position 5: 12 o'clock
+            Point3d::new(0.64278760968, 0.76604444311, 0.0),   // Position 3
+            Point3d::new(0.98480775301, 0.17364817767, 0.0),   // Position 6
+            Point3d::new(0.86602540378, -0.5, 0.0),            // Position 2
+            Point3d::new(0.34202014333, -0.93969262079, 0.0),  // Position 8
+            Point3d::new(-0.34202014333, -0.93969262079, 0.0), // Position 4
+            Point3d::new(-0.86602540378, -0.5, 0.0),           // Position 9
+            Point3d::new(-0.98480775301, 0.17364817767, 0.0),  // Position 7
+            Point3d::new(-0.64278760968, 0.76604444311, 0.0),  // Position 1
         ],
+        // Decad: 10 points clockwise from top-left (position 1)
+        // 36 degrees per step, starting at ~108 degrees (top-left)
         10 => vec![
-            Point3d::new(-0.30901699437, 0.95105651630, 0.0),
-            Point3d::new(0.30901699437, 0.95105651630, 0.0),
-            Point3d::new(0.80901699437, 0.58778525229, 0.0),
-            Point3d::new(1.0, 0.0, 0.0),
-            Point3d::new(0.80901699437, -0.58778525229, 0.0),
-            Point3d::new(0.30901699437, -0.95105651630, 0.0),
-            Point3d::new(-0.30901699437, -0.95105651630, 0.0),
-            Point3d::new(-0.80901699437, -0.58778525229, 0.0),
-            Point3d::new(-1.0, 0.0, 0.0),
-            Point3d::new(-0.80901699437, 0.58778525229, 0.0),
+            Point3d::new(-0.30901699437, 0.95105651630, 0.0),  // Position 1: top-left (~108°)
+            Point3d::new(0.30901699437, 0.95105651630, 0.0),   // Position 2: top-right
+            Point3d::new(0.80901699437, 0.58778525229, 0.0),   // Position 3
+            Point3d::new(1.0, 0.0, 0.0),                       // Position 4: 3 o'clock
+            Point3d::new(0.80901699437, -0.58778525229, 0.0),  // Position 5
+            Point3d::new(0.30901699437, -0.95105651630, 0.0),  // Position 6
+            Point3d::new(-0.30901699437, -0.95105651630, 0.0), // Position 7
+            Point3d::new(-0.80901699437, -0.58778525229, 0.0), // Position 8
+            Point3d::new(-1.0, 0.0, 0.0),                      // Position 9: 9 o'clock
+            Point3d::new(-0.80901699437, 0.58778525229, 0.0),  // Position 10
         ],
+        // Undecad: 11 points clockwise from 12 o'clock (position 1 at top)
         11 => vec![
-            Point3d::new(0.0, 1.0, 0.0),
-            Point3d::new(0.54064081745, 0.84125353283, 0.0),
-            Point3d::new(0.909632, 0.415415, 0.0),
-            Point3d::new(0.989821, -0.142315, 0.0),
-            Point3d::new(0.755750, -0.654861, 0.0),
-            Point3d::new(0.281733, -0.959493, 0.0),
-            Point3d::new(-0.281733, -0.959493, 0.0),
-            Point3d::new(-0.755750, -0.654861, 0.0),
-            Point3d::new(-0.989821, -0.142315, 0.0),
-            Point3d::new(-0.909632, 0.415415, 0.0),
-            Point3d::new(-0.54064081745, 0.84125353283, 0.0),
+            Point3d::new(0.0, 1.0, 0.0),                      // Position 1: 12 o'clock (top)
+            Point3d::new(0.54064081745, 0.84125353283, 0.0),  // Position 2
+            Point3d::new(0.909632, 0.415415, 0.0),            // Position 3
+            Point3d::new(0.989821, -0.142315, 0.0),           // Position 4
+            Point3d::new(0.755750, -0.654861, 0.0),           // Position 5
+            Point3d::new(0.281733, -0.959493, 0.0),           // Position 6
+            Point3d::new(-0.281733, -0.959493, 0.0),          // Position 7
+            Point3d::new(-0.755750, -0.654861, 0.0),          // Position 8
+            Point3d::new(-0.989821, -0.142315, 0.0),          // Position 9
+            Point3d::new(-0.909632, 0.415415, 0.0),           // Position 10
+            Point3d::new(-0.54064081745, 0.84125353283, 0.0), // Position 11
         ],
+        // Dodecad: 12 points clockwise from 12 o'clock (position 1 at top)
         12 => vec![
-            Point3d::new(0.86602540378, -0.5, 0.0),      // Wholeness
-            Point3d::new(-0.5, -0.86602540378, 0.0),     // Polarity
-            Point3d::new(0.5, -0.86602540378, 0.0),      // Relatedness
-            Point3d::new(0.0, -1.0, 0.0),                // Subsistence
-            Point3d::new(-0.86602540378, -0.5, 0.0),     // Potentiality
-            Point3d::new(-1.0, 0.0, 0.0),                // Repetition
-            Point3d::new(1.0, 0.0, 0.0),                 // Structure
-            Point3d::new(0.86602540378, 0.5, 0.0),       // Individuality
-            Point3d::new(-0.86602540378, 0.5, 0.0),      // Pattern
-            Point3d::new(0.5, 0.86602540378, 0.0),       // Creativity
-            Point3d::new(-0.5, 0.86602540378, 0.0),      // Domination
-            Point3d::new(0.0, 1.0, 0.0),                 // Autocracy
+            Point3d::new(0.0, 1.0, 0.0),                 // Position 1: 12 o'clock (top)
+            Point3d::new(0.5, 0.86602540378, 0.0),       // Position 2: 1 o'clock
+            Point3d::new(0.86602540378, 0.5, 0.0),       // Position 3: 2 o'clock
+            Point3d::new(1.0, 0.0, 0.0),                 // Position 4: 3 o'clock
+            Point3d::new(0.86602540378, -0.5, 0.0),      // Position 5: 4 o'clock
+            Point3d::new(0.5, -0.86602540378, 0.0),      // Position 6: 5 o'clock
+            Point3d::new(0.0, -1.0, 0.0),                // Position 7: 6 o'clock (bottom)
+            Point3d::new(-0.5, -0.86602540378, 0.0),     // Position 8: 7 o'clock
+            Point3d::new(-0.86602540378, -0.5, 0.0),     // Position 9: 8 o'clock
+            Point3d::new(-1.0, 0.0, 0.0),                // Position 10: 9 o'clock
+            Point3d::new(-0.86602540378, 0.5, 0.0),      // Position 11: 10 o'clock
+            Point3d::new(-0.5, 0.86602540378, 0.0),      // Position 12: 11 o'clock
         ],
         _ => vec![],
     }
 }
 
 /// Get position colours for an order
-/// Maps positions to their universal hyparchic color index
+/// Colors are assigned to positions starting at 12 o'clock, moving clockwise
 fn get_colours(order: u8) -> Vec<&'static str> {
-    // Universal hyparchic color palette (by index)
-    let hyparchic_colors = [
-        "#FF0000", // Index 1: Red
-        "#0000FF", // Index 2: Blue
-        "#FFFF00", // Index 3: Yellow
-        "#099902", // Index 4: Green
-        "#9900FF", // Index 5: Purple
-        "#FFA500", // Index 6: Orange
-        "#00FFFF", // Index 7: Light Blue/Cyan
-        "#8B4513", // Index 8: Brown
-        "#FF00FF", // Index 9: Magenta
-        "#FFFFFF", // Index 10: White
-        "#C0C0C0", // Index 11: Grey/Silver
-        "#FFD700", // Index 12: Bright Orange/Gold
-    ];
+    // Color palette
+    const RED: &str = "#FF0000";
+    const BLUE: &str = "#0000FF";
+    const YELLOW: &str = "#FFFF00";
+    const GREEN: &str = "#099902";
+    const PURPLE: &str = "#9900FF";
+    const ORANGE: &str = "#FFA500";
+    const LIGHT_BLUE: &str = "#00FFFF";
+    const BROWN: &str = "#8B4513";
+    const MAGENTA: &str = "#FF00FF";
+    const WHITE: &str = "#FFFFFF";
+    const SILVER: &str = "#C0C0C0";
+    const GOLD: &str = "#FFD700";
 
-    // Position-to-index mappings for each system
+    // Colors assigned to positions clockwise from 12 o'clock
     match order {
-        1 => vec![hyparchic_colors[0]], // Monad: position 1 → index 1 (red)
-        2 => vec![
-            hyparchic_colors[0], // Position 1 (Essence) → index 1 (red)
-            hyparchic_colors[1], // Position 2 (Existence) → index 2 (blue)
-        ],
-        3 => vec![
-            hyparchic_colors[0], // Position 1 (Will) → index 1 (red)
-            hyparchic_colors[1], // Position 2 (Function) → index 2 (blue)
-            hyparchic_colors[2], // Position 3 (Being) → index 3 (yellow)
-        ],
-        4 => vec![
-            hyparchic_colors[0], // Position 1 (Ideal) → index 1 (red)
-            hyparchic_colors[1], // Position 2 (Ground) → index 2 (blue)
-            hyparchic_colors[2], // Position 3 (Directive) → index 3 (yellow)
-            hyparchic_colors[3], // Position 4 (Instrumental) → index 4 (green)
-        ],
-        5 => vec![
-            hyparchic_colors[0], // Position 1 (Quintessence) → index 1 (red)
-            hyparchic_colors[1], // Position 2 (Source) → index 2 (blue)
-            hyparchic_colors[2], // Position 3 (Higher Potential) → index 3 (yellow)
-            hyparchic_colors[3], // Position 4 (Lower Potential) → index 4 (green)
-            hyparchic_colors[4], // Position 5 (Purpose) → index 5 (purple)
-        ],
-        6 => vec![
-            hyparchic_colors[0], // Position 1 (Priorities) → index 1 (red)
-            hyparchic_colors[1], // Position 2 (Criteria) → index 2 (blue)
-            hyparchic_colors[2], // Position 3 (Values) → index 3 (yellow)
-            hyparchic_colors[3], // Position 4 (Resources) → index 4 (green)
-            hyparchic_colors[4], // Position 5 (Options) → index 5 (purple)
-            hyparchic_colors[5], // Position 6 (Facts) → index 6 (orange)
-        ],
-        7 => vec![
-            hyparchic_colors[0], // Position 1 (Insight) → index 1 (red)
-            hyparchic_colors[1], // Position 2 (Application) → index 2 (blue)
-            hyparchic_colors[2], // Position 3 (Design) → index 3 (yellow)
-            hyparchic_colors[3], // Position 4 (Research) → index 4 (green)
-            hyparchic_colors[4], // Position 5 (Synthesis) → index 5 (purple)
-            hyparchic_colors[5], // Position 6 (Delivery) → index 6 (orange)
-            hyparchic_colors[6], // Position 7 (Value) → index 7 (light blue)
-        ],
-        8 => vec![
-            hyparchic_colors[0], // Position 1 (Inherent Values) → index 1 (red)
-            hyparchic_colors[1], // Position 2 (Critical Functions) → index 2 (blue)
-            hyparchic_colors[2], // Position 3 (Organisational Modes) → index 3 (yellow)
-            hyparchic_colors[3], // Position 4 (Necessary Resourcing) → index 4 (green)
-            hyparchic_colors[4], // Position 5 (Intrinsic Nature) → index 5 (purple)
-            hyparchic_colors[5], // Position 6 (Smallest Significant Holon) → index 6 (orange)
-            hyparchic_colors[6], // Position 7 (Integrative Totality) → index 7 (light blue)
-            hyparchic_colors[7], // Position 8 (Supportive Platform) → index 8 (brown)
-        ],
-        9 => vec![
-            hyparchic_colors[0], // Position 1 (left of 12 o'clock) → index 1 (red)
-            hyparchic_colors[4], // Position 2 (12 o'clock) → index 5 (purple)
-            hyparchic_colors[2], // Position 3 → index 3 (yellow)
-            hyparchic_colors[5], // Position 4 → index 6 (orange)
-            hyparchic_colors[1], // Position 5 → index 2 (blue)
-            hyparchic_colors[7], // Position 6 → index 8 (brown)
-            hyparchic_colors[3], // Position 7 → index 4 (green)
-            hyparchic_colors[8], // Position 8 → index 9 (pink)
-            hyparchic_colors[6], // Position 9 → index 7 (light blue)
-        ],
-        10 => vec![
-            hyparchic_colors[4], // Position 1 (left topmost) → index 5 (purple)
-            hyparchic_colors[2], // Position 2 → index 3 (yellow)
-            hyparchic_colors[5], // Position 3 → index 6 (orange)
-            hyparchic_colors[8], // Position 4 → index 9 (pink)
-            hyparchic_colors[1], // Position 5 → index 2 (blue)
-            hyparchic_colors[7], // Position 6 → index 8 (brown)
-            hyparchic_colors[3], // Position 7 → index 4 (green)
-            hyparchic_colors[9], // Position 8 → index 10 (white)
-            hyparchic_colors[6], // Position 9 → index 7 (light blue)
-            hyparchic_colors[0], // Position 10 → index 1 (red)
-        ],
-        11 => vec![
-            hyparchic_colors[10], // Position 1 (top, clockwise start) → index 11 (grey/silver)
-            hyparchic_colors[2],  // Position 2 → index 3 (yellow)
-            hyparchic_colors[5],  // Position 3 → index 6 (orange)
-            hyparchic_colors[8],  // Position 4 → index 9 (magenta)
-            hyparchic_colors[1],  // Position 5 → index 2 (blue)
-            hyparchic_colors[7],  // Position 6 → index 8 (brown)
-            hyparchic_colors[3],  // Position 7 → index 4 (green)
-            hyparchic_colors[9],  // Position 8 → index 10 (white)
-            hyparchic_colors[6],  // Position 9 → index 7 (light blue)
-            hyparchic_colors[0],  // Position 10 → index 1 (red)
-            hyparchic_colors[4],  // Position 11 → index 5 (purple)
-        ],
-        // Dodecad: clockwise from 12 o'clock: 9, 6, 3, 5, 2, 10, 7, 8, 4, 11, 12, 1
-        12 => vec![
-            hyparchic_colors[8],  // Position 1 → index 9 (magenta)
-            hyparchic_colors[5],  // Position 2 → index 6 (orange)
-            hyparchic_colors[2],  // Position 3 → index 3 (yellow)
-            hyparchic_colors[4],  // Position 4 → index 5 (purple)
-            hyparchic_colors[1],  // Position 5 → index 2 (blue)
-            hyparchic_colors[9],  // Position 6 → index 10 (white)
-            hyparchic_colors[6],  // Position 7 → index 7 (light blue)
-            hyparchic_colors[7],  // Position 8 → index 8 (brown)
-            hyparchic_colors[3],  // Position 9 → index 4 (green)
-            hyparchic_colors[10], // Position 10 → index 11 (silver)
-            hyparchic_colors[11], // Position 11 → index 12 (gold)
-            hyparchic_colors[0],  // Position 12 → index 1 (red)
-        ],
+        1 => vec![RED],
+        2 => vec![RED, BLUE],
+        3 => vec![RED, BLUE, YELLOW],
+        4 => vec![RED, BLUE, YELLOW, GREEN],
+        5 => vec![RED, BLUE, YELLOW, GREEN, PURPLE],
+        6 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE],
+        7 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE],
+        8 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN],
+        // Ennead: colors match terms clockwise from top-left: 5=Purple, 3=Yellow, 6=Orange, 2=Blue, 8=Brown, 4=Green, 9=Magenta, 7=LightBlue, 1=Red
+        9 => vec![PURPLE, YELLOW, ORANGE, BLUE, BROWN, GREEN, MAGENTA, LIGHT_BLUE, RED],
+        // Decad: colors match terms clockwise from top-left: 5=Purple, 3=Yellow, 6=Orange, 9=Magenta, 2=Blue, 8=Brown, 4=Green, 10=White, 7=LightBlue, 1=Red
+        10 => vec![PURPLE, YELLOW, ORANGE, MAGENTA, BLUE, BROWN, GREEN, WHITE, LIGHT_BLUE, RED],
+        // Undecad: colors match terms clockwise from 12 o'clock: 11=Silver, 3=Yellow, 6=Orange, 9=Magenta, 2=Blue, 8=Brown, 4=Green, 10=White, 7=LightBlue, 1=Red, 5=Purple
+        11 => vec![SILVER, YELLOW, ORANGE, MAGENTA, BLUE, BROWN, GREEN, WHITE, LIGHT_BLUE, RED, PURPLE],
+        12 => vec![MAGENTA, ORANGE, YELLOW, PURPLE, BLUE, WHITE, LIGHT_BLUE, BROWN, GREEN, SILVER, GOLD, RED],
         _ => vec![],
     }
 }
