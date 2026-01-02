@@ -14,9 +14,6 @@ impl MonadSystem {
     // Vocabulary
     pub const TERM_CHARACTERS: [&'static str; 1] = ["Unity"];
 
-    // Index mapping: sequential (position → same index)
-    pub const INDEX_MAPPING: [u8; 1] = [1];
-
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 0] = [];
 
     // Topology

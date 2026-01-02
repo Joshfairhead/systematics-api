@@ -15,9 +15,6 @@ impl TriadSystem {
     // Semantic ordering: Will (1), Function (2), Being (3) when displayed with one-based indexing
     pub const TERM_CHARACTERS: [&'static str; 3] = ["Will", "Function", "Being"];
 
-    // Index mapping: sequential (position → same index)
-    pub const INDEX_MAPPING: [u8; 3] = [1, 2, 3];
-
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 3] = [
         ("Act1", "Function", "Being"),
         ("Act2", "Being", "Will"),

@@ -15,9 +15,6 @@ impl PentadSystem {
     // Semantic ordering: Quintessence (1), Source (2), Higher Potential (3), Lower Potential (4), Purpose (5) when displayed with one-based indexing
     pub const TERM_CHARACTERS: [&'static str; 5] = ["Quintessence", "Source", "Higher Potential", "Lower Potential", "Purpose"];
 
-    // Index mapping: sequential (position → same index)
-    pub const INDEX_MAPPING: [u8; 5] = [1, 2, 3, 4, 5];
-
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 10] = [
         ("Input", "Source", "Lower Potential"),
         ("Quantitative Match", "Source", "Quintessence"),
