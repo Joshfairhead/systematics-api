@@ -405,34 +405,36 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(1.0, 0.0, 0.0),                       // Position 9: 3 o'clock (4th in sequence)
             Point3d::new(-0.80901699437, -0.58778525229, 0.0), // Position 10: 8 o'clock (8th in sequence)
         ],
-        // Undecad: 11 points clockwise from 12 o'clock
+        // Undecad: 11 points - hyparchic layout clockwise from 12 o'clock: 11, 3, 6, 9, 2, 8, 4, 10, 7, 1, 5
+        // Position N gets the coordinate where it appears in the hyparchic sequence
         11 => vec![
-            Point3d::new(0.0, 1.0, 0.0),                      // Position 1: 12 o'clock
-            Point3d::new(0.54064081745, 0.84125353283, 0.0),  // Position 2
-            Point3d::new(0.909632, 0.415415, 0.0),            // Position 3
-            Point3d::new(0.989821, -0.142315, 0.0),           // Position 4
-            Point3d::new(0.755750, -0.654861, 0.0),           // Position 5
-            Point3d::new(0.281733, -0.959493, 0.0),           // Position 6
-            Point3d::new(-0.281733, -0.959493, 0.0),          // Position 7
-            Point3d::new(-0.755750, -0.654861, 0.0),          // Position 8
-            Point3d::new(-0.989821, -0.142315, 0.0),          // Position 9
-            Point3d::new(-0.909632, 0.415415, 0.0),           // Position 10
-            Point3d::new(-0.54064081745, 0.84125353283, 0.0), // Position 11
+            Point3d::new(-0.909632, 0.415415, 0.0),           // Position 1 (Red): 10th in sequence → 9 o'clock
+            Point3d::new(0.755750, -0.654861, 0.0),           // Position 2 (Blue): 5th in sequence → 4 o'clock
+            Point3d::new(0.54064081745, 0.84125353283, 0.0),  // Position 3 (Yellow): 2nd in sequence → 1 o'clock
+            Point3d::new(-0.281733, -0.959493, 0.0),          // Position 4 (Green): 7th in sequence → 6 o'clock
+            Point3d::new(-0.54064081745, 0.84125353283, 0.0), // Position 5 (Purple): 11th in sequence → 10 o'clock
+            Point3d::new(0.909632, 0.415415, 0.0),            // Position 6 (Orange): 3rd in sequence → 2 o'clock
+            Point3d::new(-0.989821, -0.142315, 0.0),          // Position 7 (Light Blue): 9th in sequence → 8 o'clock
+            Point3d::new(0.281733, -0.959493, 0.0),           // Position 8 (Brown): 6th in sequence → 5 o'clock
+            Point3d::new(0.989821, -0.142315, 0.0),           // Position 9 (Magenta): 4th in sequence → 3 o'clock
+            Point3d::new(-0.755750, -0.654861, 0.0),          // Position 10 (White): 8th in sequence → 7 o'clock
+            Point3d::new(0.0, 1.0, 0.0),                      // Position 11 (Silver): 1st in sequence → 12 o'clock
         ],
-        // Dodecad: 12 points clockwise from 12 o'clock
+        // Dodecad: 12 points - hyparchic layout clockwise from 12 o'clock: 9, 6, 3, 5, 2, 10, 7, 8, 4, 11, 12, 1
+        // Position N gets the coordinate where it appears in the hyparchic sequence
         12 => vec![
-            Point3d::new(0.0, 1.0, 0.0),                 // Position 1: 12 o'clock
-            Point3d::new(0.5, 0.86602540378, 0.0),       // Position 2: 1 o'clock
-            Point3d::new(0.86602540378, 0.5, 0.0),       // Position 3: 2 o'clock
-            Point3d::new(1.0, 0.0, 0.0),                 // Position 4: 3 o'clock
-            Point3d::new(0.86602540378, -0.5, 0.0),      // Position 5: 4 o'clock
-            Point3d::new(0.5, -0.86602540378, 0.0),      // Position 6: 5 o'clock
-            Point3d::new(0.0, -1.0, 0.0),                // Position 7: 6 o'clock
-            Point3d::new(-0.5, -0.86602540378, 0.0),     // Position 8: 7 o'clock
-            Point3d::new(-0.86602540378, -0.5, 0.0),     // Position 9: 8 o'clock
-            Point3d::new(-1.0, 0.0, 0.0),                // Position 10: 9 o'clock
-            Point3d::new(-0.86602540378, 0.5, 0.0),      // Position 11: 10 o'clock
-            Point3d::new(-0.5, 0.86602540378, 0.0),      // Position 12: 11 o'clock
+            Point3d::new(-0.5, 0.86602540378, 0.0),      // Position 1 (Red): 11 o'clock (12th in sequence)
+            Point3d::new(0.86602540378, -0.5, 0.0),      // Position 2 (Blue): 4 o'clock (5th in sequence)
+            Point3d::new(0.86602540378, 0.5, 0.0),       // Position 3 (Yellow): 2 o'clock (3rd in sequence)
+            Point3d::new(-0.86602540378, -0.5, 0.0),     // Position 4 (Green): 8 o'clock (9th in sequence)
+            Point3d::new(1.0, 0.0, 0.0),                 // Position 5 (Purple): 3 o'clock (4th in sequence)
+            Point3d::new(0.5, 0.86602540378, 0.0),       // Position 6 (Orange): 1 o'clock (2nd in sequence)
+            Point3d::new(0.0, -1.0, 0.0),                // Position 7 (Light Blue): 6 o'clock (7th in sequence)
+            Point3d::new(-0.5, -0.86602540378, 0.0),     // Position 8 (Brown): 7 o'clock (8th in sequence)
+            Point3d::new(0.0, 1.0, 0.0),                 // Position 9 (Magenta): 12 o'clock (1st in sequence)
+            Point3d::new(0.5, -0.86602540378, 0.0),      // Position 10 (White): 5 o'clock (6th in sequence)
+            Point3d::new(-1.0, 0.0, 0.0),                // Position 11 (Silver): 9 o'clock (10th in sequence)
+            Point3d::new(-0.86602540378, 0.5, 0.0),      // Position 12 (Gold): 10 o'clock (11th in sequence)
         ],
         _ => vec![],
     }
