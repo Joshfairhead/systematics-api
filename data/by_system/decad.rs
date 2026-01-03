@@ -27,20 +27,6 @@ impl DecadSystem {
         "Position10"
     ];
 
-    // Index mapping: position → hyparchic index
-    // Each position gets the index corresponding to its displayed color (universal scheme)
-    pub const INDEX_MAPPING: [u8; 10] = [
-        5,  // Position 1 → index 5 (purple)
-        3,  // Position 2 → index 3 (yellow)
-        6,  // Position 3 → index 6 (orange)
-        9,  // Position 4 → index 9 (pink)
-        2,  // Position 5 → index 2 (blue)
-        8,  // Position 6 → index 8 (brown)
-        4,  // Position 7 → index 4 (green)
-        10, // Position 8 → index 10 (white)
-        7,  // Position 9 → index 7 (light blue)
-        1,  // Position 10 → index 1 (red)
-    ];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 45] = [
         ("Needs Research1", "Position1", "Position2"),
         ("Needs Research2", "Position1", "Position3"),

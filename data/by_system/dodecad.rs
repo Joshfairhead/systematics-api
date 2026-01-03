@@ -28,22 +28,6 @@ impl DodecadSystem {
         "Autocracy"
     ];
 
-    // Index mapping: position → hyparchic index
-    // Each position gets the index corresponding to its displayed color (universal scheme)
-    pub const INDEX_MAPPING: [u8; 12] = [
-        2,  // Position 0 (Wholeness) → index 2 (blue)
-        8,  // Position 1 (Polarity) → index 8 (brown)
-        10, // Position 2 (Relatedness) → index 10 (white)
-        7,  // Position 3 (Subsistence) → index 7 (light blue)
-        4,  // Position 4 (Potentiality) → index 4 (green)
-        11, // Position 5 (Repetition) → index 11 (grey/silver)
-        5,  // Position 6 (Structure) → index 5 (purple)
-        3,  // Position 7 (Individuality) → index 3 (yellow)
-        12, // Position 8 (Pattern) → index 12 (bright orange/gold)
-        6,  // Position 9 (Creativity) → index 6 (orange)
-        1,  // Position 10 (Domination) → index 1 (red)
-        9,  // Position 11 (Autocracy) → index 9 (pink)
-    ];
     pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 66] = [
         ("Needs Research1", "Wholeness", "Polarity"),
         ("Needs Research2", "Wholeness", "Relatedness"),
