@@ -180,7 +180,6 @@ impl From<Language> for GqlLanguage {
 #[derive(Enum, Copy, Clone, Eq, PartialEq, Debug)]
 pub enum GqlLinkType {
     Line,
-    Edge,
     Connective,
 }
 
@@ -391,7 +390,6 @@ impl GqlLink {
     async fn link_type(&self) -> GqlLinkType {
         match &self.link.link_type {
             LinkType::Line => GqlLinkType::Line,
-            LinkType::Edge => GqlLinkType::Edge,
             LinkType::Connective(_) => GqlLinkType::Connective,
         }
     }

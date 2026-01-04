@@ -1,67 +1,30 @@
-use crate::core::topology::{Node, Edge};
-use crate::core::geometry::Coordinates;
-
 pub struct PentadSystem;
 
 impl PentadSystem {
-    // Metadata
+    // Metadata (homotopy types)
     pub const SYSTEM_NAME: &'static str = "Pentad";
-    pub const COHERENCE_ATTRIBUTE: &'static str = "Significance and Potential";
+    pub const COHERENCE: &'static str = "Significance and Potential";
     pub const TERM_DESIGNATION: &'static str = "Limits";
     pub const CONNECTIVE_DESIGNATION: &'static str = "Mutualities";
-    pub const SOURCE: &'static str = "Elementary Systematics";
 
-    // Vocabulary (from by_vocabulary/k5.rs)
-    // Semantic ordering: Quintessence (1), Source (2), Higher Potential (3), Lower Potential (4), Purpose (5) when displayed with one-based indexing
-    pub const TERM_CHARACTERS: [&'static str; 5] = ["Quintessence", "Source", "Higher Potential", "Lower Potential", "Purpose"];
+    // Parallel arrays - bimorphic by index (index 0 = position 1, etc.)
+    // Position 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
+    pub const TERMS: [&'static str; 5] = ["Quintessence", "Source", "Higher Potential", "Lower Potential", "Purpose"];
+    pub const COLOURS_HEX: [&'static str; 5] = ["#FF0000", "#0000FF", "#FFFF00", "#099902", "#9900FF"];
+    pub const COLOURS_NAME: [&'static str; 5] = ["Red", "Blue", "Yellow", "Green", "Purple"];
+    pub const COORDS: [(f64, f64); 5] = [(-0.75, 0.0), (1.0, -0.75), (0.0, 0.5), (0.0, -0.5), (1.0, 0.75)];
 
-    pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 10] = [
-        ("Input", "Source", "Lower Potential"),
-        ("Quantitative Match", "Source", "Quintessence"),
-        ("Function", "Source", "Higher Potential"),
-        ("Range of Significance", "Source", "Purpose"),
-        ("Operation", "Lower Potential", "Quintessence"),
-        ("Range of Potential", "Lower Potential", "Higher Potential"),
-        ("Form", "Lower Potential", "Purpose"),
-        ("Aspiration", "Quintessence", "Higher Potential"),
-        ("Qualitative Match", "Quintessence", "Purpose"),
-        ("Output", "Higher Potential", "Purpose"),
-    ];
-
-    // Topology (from by_topology/k5.rs)
-    pub const NODES: [Node; 5] = [0, 1, 2, 3, 4];
-    pub const EDGES: [Edge; 10] = [
-        (0, 1), // Purpose-Higher Potential
-        (1, 2), // Higher Potential-Quintessence
-        (2, 3), // Quintessence-Lower Potential
-        (3, 4), // Lower Potential-Source
-        (4, 0), // Source-Purpose
-        (0, 2), // Purpose-Quintessence
-        (1, 3), // Higher Potential-Lower Potential
-        (2, 4), // Quintessence-Source
-        (3, 0), // Lower Potential-Purpose
-        (4, 1), // Source-Higher Potential
-    ];
-
-    // Geometry (from by_geometry/k5.rs)
-    // Coordinates reordered to match semantic vocabulary ordering (reversed from original)
-    pub const POINTS: [Coordinates; 5] = [
-        Coordinates { x: -0.75, y: 0.0, z: None },   // 0: Quintessence (left-center, middle)
-        Coordinates { x: 1.0, y: -0.75, z: None },   // 1: Source (right, bottom)
-        Coordinates { x: 0.0, y: 0.5, z: None },     // 2: Higher Potential (center, upper)
-        Coordinates { x: 0.0, y: -0.5, z: None },    // 3: Lower Potential (center, lower)
-        Coordinates { x: 1.0, y: 0.75, z: None },    // 4: Purpose (right, top)
-    ];
-    pub const LINES: [(Coordinates, Coordinates); 10] = [
-        (Coordinates { x: 1.0, y: -0.75, z: None }, Coordinates { x: 0.0, y: -0.5, z: None }), // Source-Lower Potential (edge 0-1)
-        (Coordinates { x: 1.0, y: -0.75, z: None }, Coordinates { x: -0.75, y: 0.0, z: None }), // Source-Quintessence (edge 0-2)
-        (Coordinates { x: 1.0, y: -0.75, z: None }, Coordinates { x: 0.0, y: 0.5, z: None }), // Source-Higher Potential (edge 0-3)
-        (Coordinates { x: 1.0, y: -0.75, z: None }, Coordinates { x: 1.0, y: 0.75, z: None }), // Source-Purpose (edge 0-4)
-        (Coordinates { x: 0.0, y: -0.5, z: None }, Coordinates { x: -0.75, y: 0.0, z: None }), // Lower Potential-Quintessence (edge 1-2)
-        (Coordinates { x: 0.0, y: -0.5, z: None }, Coordinates { x: 0.0, y: 0.5, z: None }), // Lower Potential-Higher Potential (edge 1-3)
-        (Coordinates { x: 0.0, y: -0.5, z: None }, Coordinates { x: 1.0, y: 0.75, z: None }), // Lower Potential-Purpose (edge 1-4)
-        (Coordinates { x: -0.75, y: 0.0, z: None }, Coordinates { x: 0.0, y: 0.5, z: None }), // Quintessence-Higher Potential (edge 2-3)
-        (Coordinates { x: -0.75, y: 0.0, z: None }, Coordinates { x: 1.0, y: 0.75, z: None }), // Quintessence-Purpose (edge 2-4)
-        (Coordinates { x: 0.0, y: 0.5, z: None }, Coordinates { x: 1.0, y: 0.75, z: None }), // Higher Potential-Purpose (edge 3-4)
+    // Connectives - reference by position INDEX (complete graph: 10 edges)
+    pub const CONNECTIVES: [(&'static str, usize, usize); 10] = [
+        ("Quantitative Match", 0, 1),         // Quintessence→Source (1→2)
+        ("Aspiration", 0, 2),                 // Quintessence→Higher Potential (1→3)
+        ("Operation", 0, 3),                  // Quintessence→Lower Potential (1→4)
+        ("Qualitative Match", 0, 4),          // Quintessence→Purpose (1→5)
+        ("Function", 1, 2),                   // Source→Higher Potential (2→3)
+        ("Input", 1, 3),                      // Source→Lower Potential (2→4)
+        ("Range of Significance", 1, 4),      // Source→Purpose (2→5)
+        ("Range of Potential", 2, 3),         // Higher Potential→Lower Potential (3→4)
+        ("Output", 2, 4),                     // Higher Potential→Purpose (3→5)
+        ("Form", 3, 4),                       // Lower Potential→Purpose (4→5)
     ];
 }

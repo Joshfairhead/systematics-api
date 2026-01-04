@@ -1,9 +1,8 @@
 pub struct DyadVocabulary;
 
 impl DyadVocabulary {
-    pub const TERM_CHARACTERS: [&'static str; 2] = ["Essence", "Existence"];
-    pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 1] = [
-        ("Force1", "Essence", "Existence"),
+    pub const TERMS: [&'static str; 2] = ["Essence", "Existence"];
+    pub const CONNECTIVES: [(&'static str, usize, usize); 1] = [
+        ("Force", 0, 1),
     ];
-    pub const SOURCE: &'static str = "Elementary Systematics";
 }

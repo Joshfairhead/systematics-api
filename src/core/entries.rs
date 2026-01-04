@@ -2,6 +2,9 @@
 //!
 //! Each entry has structural info (order, position, type) embedded.
 //! Entries are the nodes in our property graph.
+//!
+//! The Entry enum is a sum type for storing heterogeneous entries in a single collection,
+//! enabling the Graph to hold all entry types in one `entries` field.
 
 use serde::{Deserialize, Serialize};
 
@@ -314,6 +317,82 @@ impl SystemName {
             12 => Some("Dodecad"),
             _ => None,
         }
+    }
+}
+
+/// Entry is a sum type for storing heterogeneous entries in a single collection.
+/// This enables the Graph to hold all entry types in one `entries` field,
+/// allowing unified iteration and queries across all entry kinds.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum Entry {
+    // System-level (per-order, no position)
+    SystemName(SystemName),
+    CoherenceAttribute(CoherenceAttribute),
+    TermDesignation(TermDesignation),
+    ConnectiveDesignation(ConnectiveDesignation),
+
+    // Positional entries (per order+position)
+    Term(Term),
+    Colour(Colour),
+    Coordinate(Coordinate),
+
+    // Semantic content (reusable expressions)
+    Character(Character),
+}
+
+impl Entry {
+    /// Get the ID of this entry
+    pub fn id(&self) -> &str {
+        match self {
+            Entry::SystemName(e) => &e.id,
+            Entry::CoherenceAttribute(e) => &e.id,
+            Entry::TermDesignation(e) => &e.id,
+            Entry::ConnectiveDesignation(e) => &e.id,
+            Entry::Term(e) => &e.id,
+            Entry::Colour(e) => &e.id,
+            Entry::Coordinate(e) => &e.id,
+            Entry::Character(e) => &e.id,
+        }
+    }
+
+    /// Get the order of this entry (if applicable)
+    pub fn order(&self) -> Option<u8> {
+        match self {
+            Entry::SystemName(e) => Some(e.order),
+            Entry::CoherenceAttribute(e) => Some(e.order),
+            Entry::TermDesignation(e) => Some(e.order),
+            Entry::ConnectiveDesignation(e) => Some(e.order),
+            Entry::Term(e) => Some(e.order),
+            Entry::Colour(e) => Some(e.order),
+            Entry::Coordinate(e) => Some(e.order),
+            Entry::Character(_) => None, // Characters are order-independent
+        }
+    }
+
+    /// Get the position of this entry (if applicable)
+    pub fn position(&self) -> Option<u8> {
+        match self {
+            Entry::Term(e) => Some(e.position),
+            Entry::Colour(e) => Some(e.position),
+            Entry::Coordinate(e) => Some(e.position),
+            _ => None, // System-level entries and Characters don't have positions
+        }
+    }
+
+    /// Check if this entry is system-level (per-order, no position)
+    pub fn is_system_level(&self) -> bool {
+        matches!(
+            self,
+            Entry::SystemName(_)
+                | Entry::CoherenceAttribute(_)
+                | Entry::TermDesignation(_)
+                | Entry::ConnectiveDesignation(_)
+        )
+    }
+
+    /// Check if this entry is positional (has order and position)
+    pub fn is_positional(&self) -> bool {
+        matches!(self, Entry::Term(_) | Entry::Colour(_) | Entry::Coordinate(_))
     }
 }
 

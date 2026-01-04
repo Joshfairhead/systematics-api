@@ -378,8 +378,7 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(-1.0, 0.0, 0.0),                       // Integrative Totality (left)
             Point3d::new(0.0, -1.0, 0.0),                       // Supportive Platform (bottom)
         ],
-        // Ennead: 9 points - hyparchic layout clockwise from 12 o'clock: 5, 3, 6, 2, 8, 4, 9, 7, 1
-        // Position N gets the coordinate where it appears in the hyparchic sequence
+        // Ennead: 9 points arranged in a circle
         9 => vec![
             Point3d::new(-0.64278760968, 0.76604444311, 0.0),  // Position 1: 11 o'clock (9th in sequence)
             Point3d::new(0.86602540378, -0.5, 0.0),            // Position 2: 4 o'clock (4th in sequence)
@@ -391,8 +390,7 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(0.34202014333, -0.93969262079, 0.0),  // Position 8: 5 o'clock (5th in sequence)
             Point3d::new(-0.86602540378, -0.5, 0.0),           // Position 9: 8 o'clock (7th in sequence)
         ],
-        // Decad: 10 points - hyparchic layout clockwise from 12 o'clock: 5, 3, 6, 9, 2, 8, 4, 10, 7, 1
-        // Position N gets the coordinate where it appears in the hyparchic sequence
+        // Decad: 10 points arranged in a circle
         10 => vec![
             Point3d::new(-0.80901699437, 0.58778525229, 0.0),  // Position 1: 11 o'clock (10th in sequence)
             Point3d::new(0.80901699437, -0.58778525229, 0.0),  // Position 2: 5 o'clock (5th in sequence)
@@ -405,8 +403,7 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(1.0, 0.0, 0.0),                       // Position 9: 3 o'clock (4th in sequence)
             Point3d::new(-0.80901699437, -0.58778525229, 0.0), // Position 10: 8 o'clock (8th in sequence)
         ],
-        // Undecad: 11 points - hyparchic layout clockwise from 12 o'clock: 11, 3, 6, 9, 2, 8, 4, 10, 7, 1, 5
-        // Position N gets the coordinate where it appears in the hyparchic sequence
+        // Undecad: 11 points arranged in a circle
         11 => vec![
             Point3d::new(-0.909632, 0.415415, 0.0),           // Position 1 (Red): 10th in sequence → 9 o'clock
             Point3d::new(0.755750, -0.654861, 0.0),           // Position 2 (Blue): 5th in sequence → 4 o'clock
@@ -420,8 +417,7 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
             Point3d::new(-0.755750, -0.654861, 0.0),          // Position 10 (White): 8th in sequence → 7 o'clock
             Point3d::new(0.0, 1.0, 0.0),                      // Position 11 (Silver): 1st in sequence → 12 o'clock
         ],
-        // Dodecad: 12 points - hyparchic layout clockwise from 12 o'clock: 9, 6, 3, 5, 2, 10, 7, 8, 4, 11, 12, 1
-        // Position N gets the coordinate where it appears in the hyparchic sequence
+        // Dodecad: 12 points arranged in a circle
         12 => vec![
             Point3d::new(-0.5, 0.86602540378, 0.0),      // Position 1 (Red): 11 o'clock (12th in sequence)
             Point3d::new(0.86602540378, -0.5, 0.0),      // Position 2 (Blue): 4 o'clock (5th in sequence)
@@ -507,15 +503,8 @@ fn add_system_links(graph: &mut Graph, order: u8) {
             }
         }
         _ => {
-            // Generic edges for complete graph (all pairs)
-            for i in 1..=order {
-                for j in (i + 1)..=order {
-                    graph.add_link(Link::edge(
-                        format!("term_{}_{}", order, i),
-                        format!("term_{}_{}", order, j),
-                    ));
-                }
-            }
+            // For other orders, connectives are computed from complete graph
+            // No explicit links needed - they can be derived from order+position
         }
     }
 

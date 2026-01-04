@@ -1,23 +1,22 @@
 pub struct HexadVocabulary;
 
 impl HexadVocabulary {
-    pub const TERM_CHARACTERS: [&'static str; 6] = ["Resources", "Values", "Options", "Criteria", "Facts", "Priorities"];
-    pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 15] = [
-        ("Step1", "Resources", "Values"),
-        ("Step2", "Resources", "Options"),
-        ("Step3", "Resources", "Criteria"),
-        ("Step4", "Resources", "Facts"),
-        ("Step5", "Resources", "Priorities"),
-        ("Step6", "Values", "Options"),
-        ("Step7", "Values", "Criteria"),
-        ("Step8", "Values", "Facts"),
-        ("Step9", "Values", "Priorities"),
-        ("Step10", "Options", "Criteria"),
-        ("Step11", "Options", "Facts"),
-        ("Step12", "Options", "Priorities"),
-        ("Step13", "Criteria", "Facts"),
-        ("Step14", "Criteria", "Priorities"),
-        ("Step15", "Facts", "Priorities"),
+    pub const TERMS: [&'static str; 6] = ["Resources", "Values", "Options", "Criteria", "Facts", "Priorities"];
+    pub const CONNECTIVES: [(&'static str, usize, usize); 15] = [
+        ("Step 1-2", 0, 1),
+        ("Step 1-3", 0, 2),
+        ("Step 1-4", 0, 3),
+        ("Step 1-5", 0, 4),
+        ("Step 1-6", 0, 5),
+        ("Step 2-3", 1, 2),
+        ("Step 2-4", 1, 3),
+        ("Step 2-5", 1, 4),
+        ("Step 2-6", 1, 5),
+        ("Step 3-4", 2, 3),
+        ("Step 3-5", 2, 4),
+        ("Step 3-6", 2, 5),
+        ("Step 4-5", 3, 4),
+        ("Step 4-6", 3, 5),
+        ("Step 5-6", 4, 5),
     ];
-    pub const SOURCE: &'static str = "Elementary Systematics";
 }
