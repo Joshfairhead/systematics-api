@@ -1,19 +1,17 @@
-use crate::core::topology::{Node, Edge};
-use crate::core::geometry::Coordinates;
-
 pub struct DodecadSystem;
 
 impl DodecadSystem {
-    // Metadata
+    // Metadata (homotopy types)
     pub const SYSTEM_NAME: &'static str = "Dodecad";
-    pub const COHERENCE_ATTRIBUTE: &'static str = "Perfection";
+    pub const COHERENCE: &'static str = "Perfection";
     pub const TERM_DESIGNATION: &'static str = "Needs Research";
     pub const CONNECTIVE_DESIGNATION: &'static str = "Needs Research";
-    pub const SOURCE: &'static str = "Elementary Systematics";
 
-    // Vocabulary (from by_vocabulary/k12.rs)
-    // Original World Game ordering preserved
-    pub const TERM_CHARACTERS: [&'static str; 12] = [
+    // Parallel arrays - bimorphic by index (index 0 = position 1, etc.)
+    // Position 1=Wholeness, 2=Polarity, 3=Relatedness, 4=Subsistence,
+    // 5=Potentiality, 6=Repetition, 7=Structure, 8=Individuality,
+    // 9=Pattern, 10=Creativity, 11=Domination, 12=Autocracy
+    pub const TERMS: [&'static str; 12] = [
         "Wholeness",
         "Polarity",
         "Relatedness",
@@ -25,175 +23,92 @@ impl DodecadSystem {
         "Pattern",
         "Creativity",
         "Domination",
-        "Autocracy"
+        "Autocracy",
+    ];
+    pub const COLOURS_HEX: [&'static str; 12] = ["#FF0000", "#0000FF", "#FFFF00", "#099902", "#9900FF", "#FFA500", "#00FFFF", "#8B4513", "#FF00FF", "#FFFFFF", "#C0C0C0", "#FFD700"];
+    pub const COLOURS_NAME: [&'static str; 12] = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange", "Light Blue", "Brown", "Magenta", "White", "Silver", "Gold"];
+    pub const COORDS: [(f64, f64); 12] = [
+        (0.86602540378, -0.5),             // Position 1: Wholeness
+        (-0.5, -0.86602540378),            // Position 2: Polarity
+        (0.5, -0.86602540378),             // Position 3: Relatedness
+        (0.0, -1.0),                       // Position 4: Subsistence
+        (-0.86602540378, -0.5),            // Position 5: Potentiality
+        (-1.0, 0.0),                       // Position 6: Repetition
+        (1.0, 0.0),                        // Position 7: Structure
+        (0.86602540378, 0.5),              // Position 8: Individuality
+        (-0.86602540378, 0.5),             // Position 9: Pattern
+        (0.5, 0.86602540378),              // Position 10: Creativity
+        (-0.5, 0.86602540378),             // Position 11: Domination
+        (0.0, 1.0),                        // Position 12: Autocracy
     ];
 
-    pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 66] = [
-        ("Needs Research1", "Wholeness", "Polarity"),
-        ("Needs Research2", "Wholeness", "Relatedness"),
-        ("Needs Research3", "Wholeness", "Subsistence"),
-        ("Needs Research4", "Wholeness", "Potentiality"),
-        ("Needs Research5", "Wholeness", "Repetition"),
-        ("Needs Research6", "Wholeness", "Structure"),
-        ("Needs Research7", "Wholeness", "Individuality"),
-        ("Needs Research8", "Wholeness", "Pattern"),
-        ("Needs Research9", "Wholeness", "Creativity"),
-        ("Needs Research10", "Wholeness", "Domination"),
-        ("Needs Research11", "Wholeness", "Autocracy"),
-        ("Needs Research12", "Domination", "Creativity"),
-        ("Needs Research13", "Domination", "Pattern"),
-        ("Needs Research14", "Domination", "Individuality"),
-        ("Needs Research15", "Domination", "Structure"),
-        ("Needs Research16", "Domination", "Repetition"),
-        ("Needs Research17", "Domination", "Potentiality"),
-        ("Needs Research18", "Domination", "Subsistence"),
-        ("Needs Research19", "Domination", "Relatedness"),
-        ("Needs Research20", "Domination", "Polarity"),
-        ("Needs Research21", "Domination", "Wholeness"),
-        ("Needs Research22", "Creativity", "Pattern"),
-        ("Needs Research23", "Creativity", "Individuality"),
-        ("Needs Research24", "Creativity", "Structure"),
-        ("Needs Research25", "Creativity", "Repetition"),
-        ("Needs Research26", "Creativity", "Potentiality"),
-        ("Needs Research27", "Creativity", "Subsistence"),
-        ("Needs Research28", "Creativity", "Relatedness"),
-        ("Needs Research29", "Creativity", "Polarity"),
-        ("Needs Research30", "Creativity", "Wholeness"),
-        ("Needs Research31", "Pattern", "Individuality"),
-        ("Needs Research32", "Pattern", "Structure"),
-        ("Needs Research33", "Pattern", "Repetition"),
-        ("Needs Research34", "Pattern", "Potentiality"),
-        ("Needs Research35", "Pattern", "Subsistence"),
-        ("Needs Research36", "Pattern", "Relatedness"),
-        ("Needs Research37", "Pattern", "Polarity"),
-        ("Needs Research38", "Pattern", "Wholeness"),
-        ("Needs Research39", "Individuality", "Structure"),
-        ("Needs Research40", "Individuality", "Repetition"),
-        ("Needs Research41", "Individuality", "Potentiality"),
-        ("Needs Research42", "Individuality", "Subsistence"),
-        ("Needs Research43", "Individuality", "Relatedness"),
-        ("Needs Research44", "Individuality", "Polarity"),
-        ("Needs Research45", "Individuality", "Wholeness"),
-        ("Needs Research46", "Structure", "Repetition"),
-        ("Needs Research47", "Structure", "Potentiality"),
-        ("Needs Research48", "Structure", "Subsistence"),
-        ("Needs Research49", "Structure", "Relatedness"),
-        ("Needs Research50", "Structure", "Polarity"),
-        ("Needs Research51", "Structure", "Wholeness"),
-        ("Needs Research52", "Repetition", "Potentiality"),
-        ("Needs Research53", "Repetition", "Subsistence"),
-        ("Needs Research54", "Repetition", "Relatedness"),
-        ("Needs Research55", "Repetition", "Polarity"),
-        ("Needs Research56", "Repetition", "Wholeness"),
-        ("Needs Research57", "Potentiality", "Subsistence"),
-        ("Needs Research58", "Potentiality", "Relatedness"),
-        ("Needs Research59", "Potentiality", "Polarity"),
-        ("Needs Research60", "Potentiality", "Wholeness"),
-        ("Needs Research61", "Subsistence", "Relatedness"),
-        ("Needs Research62", "Subsistence", "Polarity"),
-        ("Needs Research63", "Subsistence", "Wholeness"),
-        ("Needs Research64", "Relatedness", "Polarity"),
-        ("Needs Research65", "Relatedness", "Wholeness"),
-        ("Needs Research66", "Polarity", "Wholeness"),
-    ];
-
-    // Topology (from by_topology/k12.rs)
-    pub const NODES: [Node; 12] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    pub const EDGES: [Edge; 66] = [
-        (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (0, 9), (0, 10), (0, 11),
-        (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11),
-        (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9), (2, 10), (2, 11),
-        (3, 4), (3, 5), (3, 6), (3, 7), (3, 8), (3, 9), (3, 10), (3, 11),
-        (4, 5), (4, 6), (4, 7), (4, 8), (4, 9), (4, 10), (4, 11),
-        (5, 6), (5, 7), (5, 8), (5, 9), (5, 10), (5, 11),
-        (6, 7), (6, 8), (6, 9), (6, 10), (6, 11),
-        (7, 8), (7, 9), (7, 10), (7, 11),
-        (8, 9), (8, 10), (8, 11),
-        (9, 10), (9, 11),
-        (10, 11),
-    ];
-
-    // Geometry (from by_geometry/k12.rs)
-    pub const POINTS: [Coordinates; 12] = [
-        Coordinates { x: 0.86602540378, y: -0.5, z: None },          // 0: Wholeness (from old 4)
-        Coordinates { x: -0.5, y: -0.86602540378, z: None },          // 1: Polarity (from old 7)
-        Coordinates { x: 0.5, y: -0.86602540378, z: None },           // 2: Relatedness (from old 5)
-        Coordinates { x: 0.0, y: -1.0, z: None },                     // 3: Subsistence (from old 6)
-        Coordinates { x: -0.86602540378, y: -0.5, z: None },          // 4: Potentiality (from old 8)
-        Coordinates { x: -1.0, y: 0.0, z: None },                     // 5: Repetition (from old 9)
-        Coordinates { x: 1.0, y: 0.0, z: None },                      // 6: Structure (from old 3)
-        Coordinates { x: 0.86602540378, y: 0.5, z: None },            // 7: Individuality (from old 2)
-        Coordinates { x: -0.86602540378, y: 0.5, z: None },           // 8: Pattern (from old 10)
-        Coordinates { x: 0.5, y: 0.86602540378, z: None },            // 9: Creativity (from old 1)
-        Coordinates { x: -0.5, y: 0.86602540378, z: None },           // 10: Domination (from old 11)
-        Coordinates { x: 0.0, y: 1.0, z: None },                      // 11: Autocracy (from old 0)
-    ];
-    pub const LINES: [(Coordinates, Coordinates); 66] = [
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 0.0, y: 1.0, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: 0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: 1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: 0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: 0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: -0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: -0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 0.5, y: 0.86602540378, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: 1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: 0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: 0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: -0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: -0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 0.86602540378, y: 0.5, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: 0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: 0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 1.0, y: 0.0, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: 0.86602540378, y: -0.5, z: None }, Coordinates { x: 0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.86602540378, y: -0.5, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.86602540378, y: -0.5, z: None }, Coordinates { x: -0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.86602540378, y: -0.5, z: None }, Coordinates { x: -0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.86602540378, y: -0.5, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.86602540378, y: -0.5, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 0.86602540378, y: -0.5, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: 0.5, y: -0.86602540378, z: None }, Coordinates { x: 0.0, y: -1.0, z: None }),
-        (Coordinates { x: 0.5, y: -0.86602540378, z: None }, Coordinates { x: -0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.5, y: -0.86602540378, z: None }, Coordinates { x: -0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.5, y: -0.86602540378, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.5, y: -0.86602540378, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 0.5, y: -0.86602540378, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -0.5, y: -0.86602540378, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: 0.0, y: -1.0, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: -0.5, y: -0.86602540378, z: None }, Coordinates { x: -0.86602540378, y: -0.5, z: None }),
-        (Coordinates { x: -0.5, y: -0.86602540378, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: -0.5, y: -0.86602540378, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: -0.5, y: -0.86602540378, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: -0.86602540378, y: -0.5, z: None }, Coordinates { x: -1.0, y: 0.0, z: None }),
-        (Coordinates { x: -0.86602540378, y: -0.5, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: -0.86602540378, y: -0.5, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: -1.0, y: 0.0, z: None }, Coordinates { x: -0.86602540378, y: 0.5, z: None }),
-        (Coordinates { x: -1.0, y: 0.0, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
-        (Coordinates { x: -0.86602540378, y: 0.5, z: None }, Coordinates { x: -0.5, y: 0.86602540378, z: None }),
+    // Connectives - reference by position INDEX (complete graph: 66 edges)
+    pub const CONNECTIVES: [(&'static str, usize, usize); 66] = [
+        ("Needs Research 1-2", 0, 1),
+        ("Needs Research 1-3", 0, 2),
+        ("Needs Research 1-4", 0, 3),
+        ("Needs Research 1-5", 0, 4),
+        ("Needs Research 1-6", 0, 5),
+        ("Needs Research 1-7", 0, 6),
+        ("Needs Research 1-8", 0, 7),
+        ("Needs Research 1-9", 0, 8),
+        ("Needs Research 1-10", 0, 9),
+        ("Needs Research 1-11", 0, 10),
+        ("Needs Research 1-12", 0, 11),
+        ("Needs Research 2-3", 1, 2),
+        ("Needs Research 2-4", 1, 3),
+        ("Needs Research 2-5", 1, 4),
+        ("Needs Research 2-6", 1, 5),
+        ("Needs Research 2-7", 1, 6),
+        ("Needs Research 2-8", 1, 7),
+        ("Needs Research 2-9", 1, 8),
+        ("Needs Research 2-10", 1, 9),
+        ("Needs Research 2-11", 1, 10),
+        ("Needs Research 2-12", 1, 11),
+        ("Needs Research 3-4", 2, 3),
+        ("Needs Research 3-5", 2, 4),
+        ("Needs Research 3-6", 2, 5),
+        ("Needs Research 3-7", 2, 6),
+        ("Needs Research 3-8", 2, 7),
+        ("Needs Research 3-9", 2, 8),
+        ("Needs Research 3-10", 2, 9),
+        ("Needs Research 3-11", 2, 10),
+        ("Needs Research 3-12", 2, 11),
+        ("Needs Research 4-5", 3, 4),
+        ("Needs Research 4-6", 3, 5),
+        ("Needs Research 4-7", 3, 6),
+        ("Needs Research 4-8", 3, 7),
+        ("Needs Research 4-9", 3, 8),
+        ("Needs Research 4-10", 3, 9),
+        ("Needs Research 4-11", 3, 10),
+        ("Needs Research 4-12", 3, 11),
+        ("Needs Research 5-6", 4, 5),
+        ("Needs Research 5-7", 4, 6),
+        ("Needs Research 5-8", 4, 7),
+        ("Needs Research 5-9", 4, 8),
+        ("Needs Research 5-10", 4, 9),
+        ("Needs Research 5-11", 4, 10),
+        ("Needs Research 5-12", 4, 11),
+        ("Needs Research 6-7", 5, 6),
+        ("Needs Research 6-8", 5, 7),
+        ("Needs Research 6-9", 5, 8),
+        ("Needs Research 6-10", 5, 9),
+        ("Needs Research 6-11", 5, 10),
+        ("Needs Research 6-12", 5, 11),
+        ("Needs Research 7-8", 6, 7),
+        ("Needs Research 7-9", 6, 8),
+        ("Needs Research 7-10", 6, 9),
+        ("Needs Research 7-11", 6, 10),
+        ("Needs Research 7-12", 6, 11),
+        ("Needs Research 8-9", 7, 8),
+        ("Needs Research 8-10", 7, 9),
+        ("Needs Research 8-11", 7, 10),
+        ("Needs Research 8-12", 7, 11),
+        ("Needs Research 9-10", 8, 9),
+        ("Needs Research 9-11", 8, 10),
+        ("Needs Research 9-12", 8, 11),
+        ("Needs Research 10-11", 9, 10),
+        ("Needs Research 10-12", 9, 11),
+        ("Needs Research 11-12", 10, 11),
     ];
 }

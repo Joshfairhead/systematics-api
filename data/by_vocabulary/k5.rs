@@ -1,18 +1,17 @@
 pub struct PentadVocabulary;
 
 impl PentadVocabulary {
-    pub const TERM_CHARACTERS: [&'static str; 5] = ["Purpose", "Higher Potential", "Quintessence", "Lower Potential", "Source"];
-    pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 10] = [
-        ("Range of Potential", "Higher Potential", "Lower Potential"),
-        ("Range of Significance", "Purpose", "Source"),
-        ("Aspiration", "Quintessence", "Higher Potential"),
-        ("Operation", "Quintessence", "Lower Potential"),
-        ("Output", "Higher Potential", "Purpose"),
-        ("Input", "Lower Potential", "Source"),
-        ("Qualitative Match", "Quintessence", "Purpose"),
-        ("Quantitative Match", "Quintessence", "Source"),
-        ("Form", "Lower Potential", "Purpose"),
-        ("Function", "Higher Potential", "Source"),
+    pub const TERMS: [&'static str; 5] = ["Purpose", "Higher Potential", "Quintessence", "Lower Potential", "Source"];
+    pub const CONNECTIVES: [(&'static str, usize, usize); 10] = [
+        ("Mutuality 1-2", 0, 1),
+        ("Mutuality 1-3", 0, 2),
+        ("Mutuality 1-4", 0, 3),
+        ("Mutuality 1-5", 0, 4),
+        ("Mutuality 2-3", 1, 2),
+        ("Mutuality 2-4", 1, 3),
+        ("Mutuality 2-5", 1, 4),
+        ("Mutuality 3-4", 2, 3),
+        ("Mutuality 3-5", 2, 4),
+        ("Mutuality 4-5", 3, 4),
     ];
-    pub const SOURCE: &'static str = "Elementary Systematics";
 }

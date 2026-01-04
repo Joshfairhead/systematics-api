@@ -1,37 +1,20 @@
-use crate::core::topology::{Node, Edge};
-use crate::core::geometry::Coordinates;
-
 pub struct DyadSystem;
 
 impl DyadSystem {
-    // Metadata
+    // Metadata (homotopy types)
     pub const SYSTEM_NAME: &'static str = "Dyad";
-    pub const COHERENCE_ATTRIBUTE: &'static str = "Complimentarity";
+    pub const COHERENCE: &'static str = "Complementarity";
     pub const TERM_DESIGNATION: &'static str = "Poles";
     pub const CONNECTIVE_DESIGNATION: &'static str = "Force";
-    pub const SOURCE: &'static str = "Elementary Systematics";
 
-    // Vocabulary
-    // Semantic ordering: Essence (1), Existence (2) when displayed with one-based indexing
-    pub const TERM_CHARACTERS: [&'static str; 2] = ["Essence", "Existence"];
+    // Parallel arrays - bimorphic by index (index 0 = position 1, index 1 = position 2)
+    pub const TERMS: [&'static str; 2] = ["Essence", "Existence"];
+    pub const COLOURS_HEX: [&'static str; 2] = ["#FF0000", "#0000FF"];
+    pub const COLOURS_NAME: [&'static str; 2] = ["Red", "Blue"];
+    pub const COORDS: [(f64, f64); 2] = [(-1.0, 0.0), (1.0, 0.0)];
 
-    pub const CONNECTIVE_CHARACTERS: [(&'static str, &'static str, &'static str); 1] = [
-        ("Force1", "Essence", "Existence"),
-    ];
-
-    // Topology
-    pub const NODES: [Node; 2] = [0, 1];
-    pub const EDGES: [Edge; 1] = [
-        (0, 1), // Single edge
-    ];
-
-    // Geometry
-    // Coordinates match vocabulary ordering: Essence (1) on left, Existence (2) on right
-    pub const POINTS: [Coordinates; 2] = [
-        Coordinates { x: -1.0, y: 0.0, z: None },  // 0: Essence (left)
-        Coordinates { x: 1.0, y: 0.0, z: None },   // 1: Existence (right)
-    ];
-    pub const LINES: [(Coordinates, Coordinates); 1] = [
-        (Coordinates { x: -1.0, y: 0.0, z: None }, Coordinates { x: 1.0, y: 0.0, z: None }), // Essence-Existence
+    // Connectives - reference by position INDEX
+    pub const CONNECTIVES: [(&'static str, usize, usize); 1] = [
+        ("Force", 0, 1),  // Essence→Existence (positions 1→2)
     ];
 }

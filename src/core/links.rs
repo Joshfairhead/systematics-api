@@ -10,8 +10,6 @@ use serde::{Deserialize, Serialize};
 pub enum LinkType {
     /// Line connects Coordinate → Coordinate (geometric edge)
     Line,
-    /// Edge connects Node → Node (topological adjacency)
-    Edge,
     /// Connective connects Term → Term, referencing a Character entry
     Connective(String), // Character ID
 }
@@ -57,14 +55,6 @@ impl Link {
         let target = target.into();
         let id = format!("line_{}_{}", base, target);
         Self::new(id, base, target, LinkType::Line)
-    }
-
-    /// Create an Edge link between two nodes
-    pub fn edge(base: impl Into<String>, target: impl Into<String>) -> Self {
-        let base = base.into();
-        let target = target.into();
-        let id = format!("edge_{}_{}", base, target);
-        Self::new(id, base, target, LinkType::Edge)
     }
 
     /// Create a Connective link between two terms, referencing a Character
@@ -115,7 +105,7 @@ mod tests {
 
     #[test]
     fn test_link_with_tag() {
-        let link = Link::edge("a", "b").with_tag("my_tag");
+        let link = Link::line("a", "b").with_tag("my_tag");
         assert_eq!(link.tag, Some("my_tag".to_string()));
     }
 }

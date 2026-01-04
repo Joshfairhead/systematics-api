@@ -1,14 +1,7 @@
-use crate::core::topology::{Node, Edge};
+use crate::core::topology::Node;
 
 pub struct K6Topology;
 
 impl K6Topology {
     pub const NODES: [Node; 6] = [0, 1, 2, 3, 4, 5];
-    pub const EDGES: [Edge; 15] = [
-        (0, 1), (0, 2), (0, 3), (0, 4), (0, 5),
-        (1, 2), (1, 3), (1, 4), (1, 5),
-        (2, 3), (2, 4), (2, 5),
-        (3, 4), (3, 5),
-        (4, 5),
-    ];
 }

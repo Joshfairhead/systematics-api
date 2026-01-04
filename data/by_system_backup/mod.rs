@@ -1,0 +1,12 @@
+pub mod monad;
+pub mod dyad;
+pub mod triad;
+pub mod tetrad;
+pub mod pentad;
+pub mod hexad;
+pub mod heptad;
+pub mod octad;
+pub mod ennead;
+pub mod decad;
+pub mod undecad;
+pub mod dodecad;

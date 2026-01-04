@@ -21,12 +21,12 @@ pub enum DyadicTermCharacters {
 /// Characters for the Triadic system
 #[derive(Debug, Clone, PartialEq)]
 pub enum TriadicTermCharacters {
-    /// First impulse character - the affirming force
+    /// Position 1 - the affirming force
     Will,
-    /// Second impulse character - the reconciling force
-    Being,
-    /// Third impulse character - the denying force
+    /// Position 2 - the denying force
     Function,
+    /// Position 3 - the reconciling force
+    Being,
 }
 
 /// Characters for the Tetradic system
@@ -96,22 +96,22 @@ pub enum HeptadicTermCharacters {
 /// Characters for the Octadic system
 #[derive(Debug, Clone, PartialEq)]
 pub enum OctadicTermCharacters {
-    /// First element character
-    SmallestSignificantHolon,
-    /// Second element character
-    CriticalFunctions,
-    /// Third element character
-    SupportivePlatform,
-    /// Fourth element character
-    NecessaryResourcing,
-    /// Fifth element character
-    IntegrativeTotality,
-    /// Sixth element character
+    /// Position 1 element character
     InherentValues,
-    /// Seventh element character
-    IntrinsicNature,
-    /// Eighth element character
+    /// Position 2 element character
+    CriticalFunctions,
+    /// Position 3 element character
     OrganisationalModes,
+    /// Position 4 element character
+    NecessaryResourcing,
+    /// Position 5 element character
+    IntrinsicNature,
+    /// Position 6 element character
+    SmallestSignificantHolon,
+    /// Position 7 element character
+    IntegrativeTotality,
+    /// Position 8 element character
+    SupportivePlatform,
 }
 
 /// A term character represents how a term manifests in a specific system
@@ -150,8 +150,8 @@ impl TermCharacters {
             },
             TermCharacters::Triadic(c) => match c {
                 TriadicTermCharacters::Will => "Will".to_string(),
-                TriadicTermCharacters::Being => "Being".to_string(),
                 TriadicTermCharacters::Function => "Function".to_string(),
+                TriadicTermCharacters::Being => "Being".to_string(),
             },
             TermCharacters::Tetradic(c) => match c {
                 TetradicTermCharacters::Ideal => "Ideal".to_string(),
@@ -184,14 +184,14 @@ impl TermCharacters {
                 HeptadicTermCharacters::Value => "Value".to_string(),
             },
             TermCharacters::Octadic(c) => match c {
-                OctadicTermCharacters::SmallestSignificantHolon => "Smallest Significant Holon".to_string(),
-                OctadicTermCharacters::CriticalFunctions => "Critical Functions".to_string(),
-                OctadicTermCharacters::SupportivePlatform => "Supportive Platform".to_string(),
-                OctadicTermCharacters::NecessaryResourcing => "Necessary Resourcing".to_string(),
-                OctadicTermCharacters::IntegrativeTotality => "Integrative Totality".to_string(),
                 OctadicTermCharacters::InherentValues => "Inherent Values".to_string(),
-                OctadicTermCharacters::IntrinsicNature => "Intrinsic Nature".to_string(),
+                OctadicTermCharacters::CriticalFunctions => "Critical Functions".to_string(),
                 OctadicTermCharacters::OrganisationalModes => "Organisational Modes".to_string(),
+                OctadicTermCharacters::NecessaryResourcing => "Necessary Resourcing".to_string(),
+                OctadicTermCharacters::IntrinsicNature => "Intrinsic Nature".to_string(),
+                OctadicTermCharacters::SmallestSignificantHolon => "Smallest Significant Holon".to_string(),
+                OctadicTermCharacters::IntegrativeTotality => "Integrative Totality".to_string(),
+                OctadicTermCharacters::SupportivePlatform => "Supportive Platform".to_string(),
             },
             TermCharacters::Custom(s) => s.clone(),
         }
