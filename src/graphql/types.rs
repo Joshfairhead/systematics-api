@@ -5,6 +5,7 @@ use crate::core::{
     Graph, Entry, Link, LinkType, Language,
     Character, Term, Coordinate, Colour,
     SystemName, CoherenceAttribute, TermDesignation, ConnectiveDesignation,
+    Order, Position, Location,
 };
 use crate::data;
 
@@ -21,6 +22,82 @@ impl QueryRoot {
     /// Get the full graph with all entries and links
     async fn graph(&self) -> GqlGraph {
         GqlGraph::new(data::build_graph())
+    }
+
+    // ========================================================================
+    // Anchor Queries
+    // ========================================================================
+
+    /// Get an Order anchor by value (1-12)
+    async fn order(&self, value: i32) -> Option<GqlOrder> {
+        if value < 1 || value > 12 {
+            return None;
+        }
+        let graph = data::build_graph();
+        graph.order(value as u8).map(|o| GqlOrder::new(o.clone(), graph.clone()))
+    }
+
+    /// Get all Order anchors
+    async fn orders(&self) -> Vec<GqlOrder> {
+        let graph = data::build_graph();
+        graph.orders()
+            .into_iter()
+            .map(|o| GqlOrder::new(o.clone(), graph.clone()))
+            .collect()
+    }
+
+    /// Get a Position anchor by value (1-12)
+    async fn position(&self, value: i32) -> Option<GqlPosition> {
+        if value < 1 || value > 12 {
+            return None;
+        }
+        let graph = data::build_graph();
+        graph.position(value as u8).map(|p| GqlPosition::new(p.clone(), graph.clone()))
+    }
+
+    /// Get all Position anchors
+    async fn positions(&self) -> Vec<GqlPosition> {
+        let graph = data::build_graph();
+        graph.positions()
+            .into_iter()
+            .map(|p| GqlPosition::new(p.clone(), graph.clone()))
+            .collect()
+    }
+
+    /// Get a Location anchor by order and position
+    async fn location(&self, order: i32, position: i32) -> Option<GqlLocation> {
+        if order < 1 || order > 12 || position < 1 || position > order {
+            return None;
+        }
+        let graph = data::build_graph();
+        graph.location(order as u8, position as u8).map(|l| GqlLocation::new(l.clone(), graph.clone()))
+    }
+
+    /// Get all Location anchors
+    async fn locations(&self) -> Vec<GqlLocation> {
+        let graph = data::build_graph();
+        graph.locations()
+            .into_iter()
+            .map(|l| GqlLocation::new(l.clone(), graph.clone()))
+            .collect()
+    }
+
+    /// Get all Locations for a given order
+    async fn locations_for_order(&self, order: i32) -> Vec<GqlLocation> {
+        let graph = data::build_graph();
+        graph.locations_for_order(order as u8)
+            .into_iter()
+            .map(|l| GqlLocation::new(l.clone(), graph.clone()))
+            .collect()
+    }
+
+    /// Get all Locations for a given position (across all orders)
+    async fn locations_for_position(&self, position: i32) -> Vec<GqlLocation> {
+        let graph = data::build_graph();
+        graph.locations_for_position(position as u8)
+            .into_iter()
+            .map(|l| GqlLocation::new(l.clone(), graph.clone()))
+            .collect()
     }
 
     // ========================================================================
@@ -264,19 +341,22 @@ impl GqlEntry {
         self.entry.position().map(|p| p as i32)
     }
 
-    /// Is this a system-level entry?
-    async fn is_system_level(&self) -> bool {
-        self.entry.is_system_level()
+    /// Is this an order-level entry? (references Order anchor)
+    async fn is_order_level_entry(&self) -> bool {
+        self.entry.is_order_level()
     }
 
-    /// Is this a positional entry?
-    async fn is_positional(&self) -> bool {
-        self.entry.is_positional()
+    /// Is this a location-level entry? (references Location anchor)
+    async fn is_location_level_entry(&self) -> bool {
+        self.entry.is_location_level()
     }
 
     /// Entry type name
     async fn entry_type(&self) -> &str {
         match &self.entry {
+            Entry::Order(_) => "Order",
+            Entry::Position(_) => "Position",
+            Entry::Location(_) => "Location",
             Entry::SystemName(_) => "SystemName",
             Entry::CoherenceAttribute(_) => "CoherenceAttribute",
             Entry::TermDesignation(_) => "TermDesignation",
@@ -285,6 +365,45 @@ impl GqlEntry {
             Entry::Colour(_) => "Colour",
             Entry::Coordinate(_) => "Coordinate",
             Entry::Character(_) => "Character",
+        }
+    }
+
+    /// Is this an anchor type?
+    async fn is_anchor(&self) -> bool {
+        self.entry.is_anchor()
+    }
+
+    /// Is this an order-level entry?
+    async fn is_order_level(&self) -> bool {
+        self.entry.is_order_level()
+    }
+
+    /// Is this a location-level entry?
+    async fn is_location_level(&self) -> bool {
+        self.entry.is_location_level()
+    }
+
+    /// As Order (if applicable)
+    async fn as_order(&self) -> Option<GqlOrder> {
+        match &self.entry {
+            Entry::Order(o) => Some(GqlOrder::new(o.clone(), self.graph.clone())),
+            _ => None,
+        }
+    }
+
+    /// As Position (if applicable)
+    async fn as_position(&self) -> Option<GqlPosition> {
+        match &self.entry {
+            Entry::Position(p) => Some(GqlPosition::new(p.clone(), self.graph.clone())),
+            _ => None,
+        }
+    }
+
+    /// As Location (if applicable)
+    async fn as_location(&self) -> Option<GqlLocation> {
+        match &self.entry {
+            Entry::Location(l) => Some(GqlLocation::new(l.clone(), self.graph.clone())),
+            _ => None,
         }
     }
 
@@ -331,7 +450,7 @@ impl GqlEntry {
     /// As Colour (if applicable)
     async fn as_colour(&self) -> Option<GqlColour> {
         match &self.entry {
-            Entry::Colour(c) => Some(GqlColour::new(c.clone())),
+            Entry::Colour(c) => Some(GqlColour::new(c.clone(), &self.graph)),
             _ => None,
         }
     }
@@ -339,7 +458,7 @@ impl GqlEntry {
     /// As Coordinate (if applicable)
     async fn as_coordinate(&self) -> Option<GqlCoordinate> {
         match &self.entry {
-            Entry::Coordinate(c) => Some(GqlCoordinate::new(c.clone())),
+            Entry::Coordinate(c) => Some(GqlCoordinate::new(c.clone(), &self.graph)),
             _ => None,
         }
     }
@@ -448,14 +567,14 @@ impl GqlLink {
 
         // If this is a line link, base IS the coordinate
         if let Entry::Coordinate(coord) = base_entry {
-            return Some(GqlCoordinate::new(coord.clone()));
+            return Some(GqlCoordinate::new(coord.clone(), &self.graph));
         }
 
         // Otherwise, look up coordinate by order and position
         let order = base_entry.order()?;
         let position = base_entry.position()?;
         self.graph.coordinate(order, position)
-            .map(|c| GqlCoordinate::new(c.clone()))
+            .map(|c| GqlCoordinate::new(c.clone(), &self.graph))
     }
 
     /// Target coordinate (for line links, returns the coordinate directly; for other links, looks up by position)
@@ -464,14 +583,14 @@ impl GqlLink {
 
         // If this is a line link, target IS the coordinate
         if let Entry::Coordinate(coord) = target_entry {
-            return Some(GqlCoordinate::new(coord.clone()));
+            return Some(GqlCoordinate::new(coord.clone(), &self.graph));
         }
 
         // Otherwise, look up coordinate by order and position
         let order = target_entry.order()?;
         let position = target_entry.position()?;
         self.graph.coordinate(order, position)
-            .map(|c| GqlCoordinate::new(c.clone()))
+            .map(|c| GqlCoordinate::new(c.clone(), &self.graph))
     }
 
     /// Base slice (term + coordinate + colour at base position)
@@ -555,6 +674,212 @@ impl GqlCharacter {
     }
 }
 
+// ============================================================================
+// Anchor Types
+// ============================================================================
+
+/// Order anchor type - the system level (1-12)
+pub struct GqlOrder {
+    order: Order,
+    graph: Graph,
+}
+
+impl GqlOrder {
+    pub fn new(order: Order, graph: Graph) -> Self {
+        Self { order, graph }
+    }
+}
+
+#[Object]
+impl GqlOrder {
+    async fn id(&self) -> &str {
+        &self.order.id
+    }
+
+    async fn value(&self) -> i32 {
+        self.order.value as i32
+    }
+
+    /// Standard name for this order (e.g., "Triad" for order 3)
+    async fn standard_name(&self) -> Option<&str> {
+        self.order.standard_name()
+    }
+
+    /// System name entry for this order
+    async fn system_name(&self) -> Option<GqlSystemName> {
+        self.graph.system_name(self.order.value)
+            .map(|s| GqlSystemName::new(s.clone()))
+    }
+
+    /// Coherence attribute for this order
+    async fn coherence(&self) -> Option<GqlCoherenceAttribute> {
+        self.graph.coherence(self.order.value)
+            .map(|c| GqlCoherenceAttribute::new(c.clone()))
+    }
+
+    /// Term designation for this order
+    async fn term_designation(&self) -> Option<GqlTermDesignation> {
+        self.graph.term_designation(self.order.value)
+            .map(|t| GqlTermDesignation::new(t.clone()))
+    }
+
+    /// Connective designation for this order
+    async fn connective_designation(&self) -> Option<GqlConnectiveDesignation> {
+        self.graph.connective_designation(self.order.value)
+            .map(|c| GqlConnectiveDesignation::new(c.clone()))
+    }
+
+    /// All locations in this order
+    async fn locations(&self) -> Vec<GqlLocation> {
+        self.graph.locations_for_order(self.order.value)
+            .into_iter()
+            .map(|l| GqlLocation::new(l.clone(), self.graph.clone()))
+            .collect()
+    }
+
+    /// All terms in this order
+    async fn terms(&self) -> Vec<GqlTerm> {
+        self.graph.terms(self.order.value, None)
+            .into_iter()
+            .map(|t| GqlTerm::new(t.clone(), &self.graph))
+            .collect()
+    }
+
+    /// All coordinates in this order
+    async fn coordinates(&self) -> Vec<GqlCoordinate> {
+        self.graph.coordinates(self.order.value)
+            .into_iter()
+            .map(|c| GqlCoordinate::new(c.clone(), &self.graph))
+            .collect()
+    }
+}
+
+/// Position anchor type - abstract "n-th place" (1-12)
+pub struct GqlPosition {
+    position: Position,
+    graph: Graph,
+}
+
+impl GqlPosition {
+    pub fn new(position: Position, graph: Graph) -> Self {
+        Self { position, graph }
+    }
+}
+
+#[Object]
+impl GqlPosition {
+    async fn id(&self) -> &str {
+        &self.position.id
+    }
+
+    async fn value(&self) -> i32 {
+        self.position.value as i32
+    }
+
+    /// All locations at this position (across all orders)
+    async fn locations(&self) -> Vec<GqlLocation> {
+        self.graph.locations_for_position(self.position.value)
+            .into_iter()
+            .map(|l| GqlLocation::new(l.clone(), self.graph.clone()))
+            .collect()
+    }
+}
+
+/// Location anchor type - the pullback of Order × Position
+pub struct GqlLocation {
+    location: Location,
+    graph: Graph,
+}
+
+impl GqlLocation {
+    pub fn new(location: Location, graph: Graph) -> Self {
+        Self { location, graph }
+    }
+}
+
+#[Object]
+impl GqlLocation {
+    async fn id(&self) -> &str {
+        &self.location.id
+    }
+
+    /// Order reference ID
+    async fn order_id(&self) -> &str {
+        &self.location.order
+    }
+
+    /// Position reference ID
+    async fn position_id(&self) -> &str {
+        &self.location.position
+    }
+
+    /// Order value (extracted from reference)
+    async fn order_value(&self) -> Option<i32> {
+        self.location.order_value().map(|v| v as i32)
+    }
+
+    /// Position value (extracted from reference)
+    async fn position_value(&self) -> Option<i32> {
+        self.location.position_value().map(|v| v as i32)
+    }
+
+    /// The Order this location belongs to
+    async fn order(&self) -> Option<GqlOrder> {
+        self.location.order_value().and_then(|v|
+            self.graph.order(v).map(|o| GqlOrder::new(o.clone(), self.graph.clone()))
+        )
+    }
+
+    /// The abstract Position this location instantiates
+    async fn position(&self) -> Option<GqlPosition> {
+        self.location.position_value().and_then(|v|
+            self.graph.position(v).map(|p| GqlPosition::new(p.clone(), self.graph.clone()))
+        )
+    }
+
+    /// All terms at this location
+    async fn terms(&self) -> Vec<GqlTerm> {
+        self.graph.terms_at_location(&self.location.id)
+            .into_iter()
+            .map(|t| GqlTerm::new(t.clone(), &self.graph))
+            .collect()
+    }
+
+    /// The coordinate at this location
+    async fn coordinate(&self) -> Option<GqlCoordinate> {
+        let order = self.location.order_value()?;
+        let position = self.location.position_value()?;
+        self.graph.coordinate(order, position)
+            .map(|c| GqlCoordinate::new(c.clone(), &self.graph))
+    }
+
+    /// All colours at this location
+    async fn colours(&self) -> Vec<GqlColour> {
+        let (Some(order), Some(position)) = (self.location.order_value(), self.location.position_value()) else {
+            return vec![];
+        };
+        [Language::Hex, Language::Name]
+            .iter()
+            .filter_map(|lang| {
+                self.graph.colour(order, position, *lang)
+                    .map(|c| GqlColour::new(c.clone(), &self.graph))
+            })
+            .collect()
+    }
+
+    /// Get colour by language
+    async fn colour(&self, language: GqlLanguage) -> Option<GqlColour> {
+        let order = self.location.order_value()?;
+        let position = self.location.position_value()?;
+        self.graph.colour(order, position, language.into())
+            .map(|c| GqlColour::new(c.clone(), &self.graph))
+    }
+}
+
+// ============================================================================
+// Location-Level Entry Types
+// ============================================================================
+
 /// Term entry
 pub struct GqlTerm {
     term: Term,
@@ -573,12 +898,19 @@ impl GqlTerm {
         &self.term.id
     }
 
-    async fn order(&self) -> i32 {
-        self.term.order as i32
+    /// Location reference ID
+    async fn location_id(&self) -> &str {
+        &self.term.location
     }
 
-    async fn position(&self) -> i32 {
-        self.term.position as i32
+    /// Order value (derived from location reference)
+    async fn order(&self) -> Option<i32> {
+        self.term.order_value().map(|v| v as i32)
+    }
+
+    /// Position value (derived from location reference)
+    async fn position(&self) -> Option<i32> {
+        self.term.position_value().map(|v| v as i32)
     }
 
     async fn character_id(&self) -> &str {
@@ -588,6 +920,14 @@ impl GqlTerm {
     /// The character this term references
     async fn character(&self) -> Option<GqlCharacter> {
         self.graph.get_character(&self.term.character).map(|c| GqlCharacter::new(c.clone()))
+    }
+
+    /// The location this term belongs to
+    async fn location(&self) -> Option<GqlLocation> {
+        let order = self.term.order_value()?;
+        let position = self.term.position_value()?;
+        self.graph.location(order, position)
+            .map(|l| GqlLocation::new(l.clone(), self.graph.clone()))
     }
 
     /// Connectives involving this term
@@ -602,11 +942,12 @@ impl GqlTerm {
 /// Coordinate entry
 pub struct GqlCoordinate {
     coordinate: Coordinate,
+    graph: Graph,
 }
 
 impl GqlCoordinate {
-    pub fn new(coordinate: Coordinate) -> Self {
-        Self { coordinate }
+    pub fn new(coordinate: Coordinate, graph: &Graph) -> Self {
+        Self { coordinate, graph: graph.clone() }
     }
 }
 
@@ -616,12 +957,19 @@ impl GqlCoordinate {
         &self.coordinate.id
     }
 
-    async fn order(&self) -> i32 {
-        self.coordinate.order as i32
+    /// Location reference ID
+    async fn location_id(&self) -> &str {
+        &self.coordinate.location
     }
 
-    async fn position(&self) -> i32 {
-        self.coordinate.position as i32
+    /// Order value (derived from location reference)
+    async fn order(&self) -> Option<i32> {
+        self.coordinate.order_value().map(|v| v as i32)
+    }
+
+    /// Position value (derived from location reference)
+    async fn position(&self) -> Option<i32> {
+        self.coordinate.position_value().map(|v| v as i32)
     }
 
     async fn x(&self) -> f64 {
@@ -635,16 +983,25 @@ impl GqlCoordinate {
     async fn z(&self) -> f64 {
         self.coordinate.value.z
     }
+
+    /// The location this coordinate belongs to
+    async fn location(&self) -> Option<GqlLocation> {
+        let order = self.coordinate.order_value()?;
+        let position = self.coordinate.position_value()?;
+        self.graph.location(order, position)
+            .map(|l| GqlLocation::new(l.clone(), self.graph.clone()))
+    }
 }
 
 /// Colour entry
 pub struct GqlColour {
     colour: Colour,
+    graph: Graph,
 }
 
 impl GqlColour {
-    pub fn new(colour: Colour) -> Self {
-        Self { colour }
+    pub fn new(colour: Colour, graph: &Graph) -> Self {
+        Self { colour, graph: graph.clone() }
     }
 }
 
@@ -654,12 +1011,19 @@ impl GqlColour {
         &self.colour.id
     }
 
-    async fn order(&self) -> i32 {
-        self.colour.order as i32
+    /// Location reference ID
+    async fn location_id(&self) -> &str {
+        &self.colour.location
     }
 
-    async fn position(&self) -> i32 {
-        self.colour.position as i32
+    /// Order value (derived from location reference)
+    async fn order(&self) -> Option<i32> {
+        self.colour.order_value().map(|v| v as i32)
+    }
+
+    /// Position value (derived from location reference)
+    async fn position(&self) -> Option<i32> {
+        self.colour.position_value().map(|v| v as i32)
     }
 
     async fn language(&self) -> GqlLanguage {
@@ -669,7 +1033,19 @@ impl GqlColour {
     async fn value(&self) -> &str {
         &self.colour.value
     }
+
+    /// The location this colour belongs to
+    async fn location(&self) -> Option<GqlLocation> {
+        let order = self.colour.order_value()?;
+        let position = self.colour.position_value()?;
+        self.graph.location(order, position)
+            .map(|l| GqlLocation::new(l.clone(), self.graph.clone()))
+    }
 }
+
+// ============================================================================
+// Order-Level Entry Types
+// ============================================================================
 
 /// SystemName entry
 pub struct GqlSystemName {
@@ -688,8 +1064,14 @@ impl GqlSystemName {
         &self.system_name.id
     }
 
-    async fn order(&self) -> i32 {
-        self.system_name.order as i32
+    /// Order reference ID
+    async fn order_id(&self) -> &str {
+        &self.system_name.order
+    }
+
+    /// Order value (derived from order reference)
+    async fn order(&self) -> Option<i32> {
+        self.system_name.order_value().map(|v| v as i32)
     }
 
     async fn value(&self) -> &str {
@@ -714,8 +1096,14 @@ impl GqlCoherenceAttribute {
         &self.coherence.id
     }
 
-    async fn order(&self) -> i32 {
-        self.coherence.order as i32
+    /// Order reference ID
+    async fn order_id(&self) -> &str {
+        &self.coherence.order
+    }
+
+    /// Order value (derived from order reference)
+    async fn order(&self) -> Option<i32> {
+        self.coherence.order_value().map(|v| v as i32)
     }
 
     async fn value(&self) -> &str {
@@ -740,8 +1128,14 @@ impl GqlTermDesignation {
         &self.term_designation.id
     }
 
-    async fn order(&self) -> i32 {
-        self.term_designation.order as i32
+    /// Order reference ID
+    async fn order_id(&self) -> &str {
+        &self.term_designation.order
+    }
+
+    /// Order value (derived from order reference)
+    async fn order(&self) -> Option<i32> {
+        self.term_designation.order_value().map(|v| v as i32)
     }
 
     async fn value(&self) -> &str {
@@ -766,8 +1160,14 @@ impl GqlConnectiveDesignation {
         &self.connective_designation.id
     }
 
-    async fn order(&self) -> i32 {
-        self.connective_designation.order as i32
+    /// Order reference ID
+    async fn order_id(&self) -> &str {
+        &self.connective_designation.order
+    }
+
+    /// Order value (derived from order reference)
+    async fn order(&self) -> Option<i32> {
+        self.connective_designation.order_value().map(|v| v as i32)
     }
 
     async fn value(&self) -> &str {
@@ -823,14 +1223,14 @@ impl GqlSystemView {
     async fn coordinates(&self) -> Vec<GqlCoordinate> {
         self.graph.coordinates(self.order)
             .into_iter()
-            .map(|c| GqlCoordinate::new(c.clone()))
+            .map(|c| GqlCoordinate::new(c.clone(), &self.graph))
             .collect()
     }
 
     async fn colours(&self) -> Vec<GqlColour> {
         self.graph.colours(self.order)
             .into_iter()
-            .map(|c| GqlColour::new(c.clone()))
+            .map(|c| GqlColour::new(c.clone(), &self.graph))
             .collect()
     }
 
@@ -916,13 +1316,13 @@ impl GqlSlice {
 
     async fn coordinate(&self) -> Option<GqlCoordinate> {
         self.graph.coordinate(self.order, self.position)
-            .map(|c| GqlCoordinate::new(c.clone()))
+            .map(|c| GqlCoordinate::new(c.clone(), &self.graph))
     }
 
     async fn colour(&self, language: Option<GqlLanguage>) -> Option<GqlColour> {
         let lang = language.map(|l| l.into()).unwrap_or(Language::Hex);
         self.graph.colour(self.order, self.position, lang)
-            .map(|c| GqlColour::new(c.clone()))
+            .map(|c| GqlColour::new(c.clone(), &self.graph))
     }
 
     /// All isomorphic terms at this position (across languages)

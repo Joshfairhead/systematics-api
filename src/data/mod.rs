@@ -1,30 +1,111 @@
 //! Data module for populating the property graph.
 //!
 //! This module provides functions to build the complete graph with all
-//! system data including Characters, Terms, Coordinates, Colours, and Links.
+//! system data including anchor types, Characters, Terms, Coordinates,
+//! Colours, and Links.
+//!
+//! Data loading follows the category-theoretic structure:
+//! 1. Create anchor entries first (Order, Position, Location)
+//! 2. Add geometry (Coordinates, Colours, Lines) - invariant structure
+//! 3. Add order-level metadata (SystemName, Coherence, Designations)
+//! 4. Add vocabulary-specific content (Characters, Terms, Connectives)
 
 use crate::core::{
     Character, CoherenceAttribute, ConnectiveDesignation, Colour, Coordinate, Entry, Graph,
-    Language, Link, Point3d, SystemName, Term, TermDesignation,
+    Language, Link, Location, Order, Point3d, Position, SystemName, Term, TermDesignation,
 };
 
 /// Build the complete graph with all systems (1-12)
 pub fn build_graph() -> Graph {
     let mut graph = Graph::new();
 
-    // Add all system metadata
+    // 1. Create anchor entries first (invariant structure)
+    add_orders(&mut graph);
+    add_positions(&mut graph);
+    add_locations(&mut graph);
+
+    // 2. Add geometry (invariant, references Location)
+    for order in 1..=12 {
+        add_coordinates(&mut graph, order);
+        add_colours(&mut graph, order);
+    }
+
+    // 3. Add order-level metadata (references Order)
     add_system_metadata(&mut graph);
 
-    // Add characters for canonical vocabulary
+    // 4. Add vocabulary-specific content (references Location)
     add_canonical_characters(&mut graph);
-
-    // Add terms, coordinates, colours, and links for each system
     for order in 1..=12 {
-        add_system_entries(&mut graph, order);
+        add_terms(&mut graph, order);
+    }
+
+    // 5. Add links (connectives and lines)
+    for order in 1..=12 {
+        add_system_links(&mut graph, order);
     }
 
     graph
 }
+
+// =============================================================================
+// Anchor Creation - Fundamental structure
+// =============================================================================
+
+/// Add all Order entries (1-12)
+fn add_orders(graph: &mut Graph) {
+    for i in 1..=12 {
+        graph.add_entry(Entry::Order(Order::new(i)));
+    }
+}
+
+/// Add all Position entries (1-12)
+fn add_positions(graph: &mut Graph) {
+    for i in 1..=12 {
+        graph.add_entry(Entry::Position(Position::new(i)));
+    }
+}
+
+/// Add all Location entries (pullback of Order × Position)
+fn add_locations(graph: &mut Graph) {
+    for order in 1..=12u8 {
+        for position in 1..=order {
+            graph.add_entry(Entry::Location(Location::new(order, position)));
+        }
+    }
+}
+
+// =============================================================================
+// Geometry - Invariant structure mapped to Locations
+// =============================================================================
+
+/// Add coordinates for a specific system order
+fn add_coordinates(graph: &mut Graph, order: u8) {
+    let coords = get_coordinates(order);
+    for (idx, coord) in coords.iter().enumerate() {
+        let position = (idx + 1) as u8;
+        graph.add_entry(Entry::Coordinate(Coordinate::with_auto_id(
+            order, position, *coord,
+        )));
+    }
+}
+
+/// Add colours for a specific system order
+fn add_colours(graph: &mut Graph, order: u8) {
+    let colours = get_colours(order);
+    for (idx, colour) in colours.iter().enumerate() {
+        let position = (idx + 1) as u8;
+        graph.add_entry(Entry::Colour(Colour::with_auto_id(
+            order,
+            position,
+            Language::Hex,
+            *colour,
+        )));
+    }
+}
+
+// =============================================================================
+// Order-Level Metadata - References Order anchor
+// =============================================================================
 
 /// Add system-level metadata for all orders
 fn add_system_metadata(graph: &mut Graph) {
@@ -114,6 +195,10 @@ fn add_system_metadata(graph: &mut Graph) {
         ));
     }
 }
+
+// =============================================================================
+// Vocabulary-Specific Content - Characters and Terms
+// =============================================================================
 
 /// Add canonical vocabulary characters
 fn add_canonical_characters(graph: &mut Graph) {
@@ -213,49 +298,75 @@ fn add_canonical_characters(graph: &mut Graph) {
     }
 }
 
-
-/// Add entries for a specific system order
-fn add_system_entries(graph: &mut Graph, order: u8) {
+/// Add terms for a specific order (references Location)
+fn add_terms(graph: &mut Graph, order: u8) {
     let term_chars = get_term_characters(order);
-    let coords = get_coordinates(order);
-    let colours = get_colours(order);
 
-    // All orders use sequential positions 1..=order
-    for position in 1..=order {
-        let idx = (position - 1) as usize;
+    for (idx, char_name) in term_chars.iter().enumerate() {
+        let position = (idx + 1) as u8;
+        let char_id = format!(
+            "char_canonical_{}",
+            char_name.to_lowercase().replace(' ', "_")
+        );
+        graph.add_entry(Entry::Term(Term::with_auto_id(order, position, &char_id)));
+    }
+}
 
-        // Add term
-        if idx < term_chars.len() {
-            let char_id = format!(
-                "char_canonical_{}",
-                term_chars[idx].to_lowercase().replace(' ', "_")
-            );
-            graph.add_entry(Entry::Term(Term::with_auto_id(order, position, &char_id)));
+// =============================================================================
+// Links - Connectives and Lines
+// =============================================================================
+
+/// Add links (connectives and lines) for a system
+fn add_system_links(graph: &mut Graph, order: u8) {
+    // Add connective links for specific orders
+    match order {
+        3 => {
+            // Triad: Acts between terms
+            let acts = [
+                ("term_3_1", "term_3_2", "act1"),
+                ("term_3_2", "term_3_3", "act2"),
+                ("term_3_3", "term_3_1", "act3"),
+            ];
+            for (from, to, act) in acts {
+                let char_id = format!("char_canonical_{}", act);
+                graph.add_link(Link::connective(from, to, &char_id));
+            }
         }
-
-        // Add coordinate
-        if idx < coords.len() {
-            graph.add_entry(Entry::Coordinate(Coordinate::with_auto_id(
-                order,
-                position,
-                coords[idx],
-            )));
+        4 => {
+            // Tetrad: Interplays between all pairs
+            let interplays = [
+                ("term_4_1", "term_4_2", "receptive_regard"),
+                ("term_4_1", "term_4_3", "effectual_compatibility"),
+                ("term_4_1", "term_4_4", "motivational_imperative"),
+                ("term_4_2", "term_4_3", "demonstrable_activity"),
+                ("term_4_2", "term_4_4", "material_mastery"),
+                ("term_4_3", "term_4_4", "technical_power"),
+            ];
+            for (from, to, name) in interplays {
+                let char_id = format!("char_canonical_{}", name);
+                graph.add_link(Link::connective(from, to, &char_id));
+            }
         }
-
-        // Add colour
-        if idx < colours.len() {
-            graph.add_entry(Entry::Colour(Colour::with_auto_id(
-                order,
-                position,
-                Language::Hex,
-                colours[idx],
-            )));
+        _ => {
+            // For other orders, connectives are computed from complete graph
+            // No explicit links needed - they can be derived from order+position
         }
     }
 
-    // Add links (connectives and lines)
-    add_system_links(graph, order);
+    // Add line links between all coordinates (complete graph)
+    for i in 1..=order {
+        for j in (i + 1)..=order {
+            graph.add_link(Link::line(
+                format!("coord_{}_{}", order, i),
+                format!("coord_{}_{}", order, j),
+            ));
+        }
+    }
 }
+
+// =============================================================================
+// Data Helpers
+// =============================================================================
 
 /// Get term characters for an order
 fn get_term_characters(order: u8) -> Vec<&'static str> {
@@ -310,16 +421,18 @@ fn get_term_characters(order: u8) -> Vec<&'static str> {
         ],
         // Decad: Sequential positions 1-10
         10 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8", "Term 9", "Term 10",
+            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+            "Term 9", "Term 10",
         ],
         // Undecad: Sequential positions 1-11
         11 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8", "Term 9", "Term 10", "Term 11",
+            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+            "Term 9", "Term 10", "Term 11",
         ],
         // Dodecad: Sequential positions 1-12
         12 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6",
-            "Term 7", "Term 8", "Term 9", "Term 10", "Term 11", "Term 12",
+            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+            "Term 9", "Term 10", "Term 11", "Term 12",
         ],
         _ => vec![],
     }
@@ -330,114 +443,113 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
     match order {
         1 => vec![Point3d::new(0.0, 0.0, 0.0)],
         2 => vec![
-            Point3d::new(-1.0, 0.0, 0.0),  // Essence (left)
-            Point3d::new(1.0, 0.0, 0.0),   // Existence (right)
+            Point3d::new(-1.0, 0.0, 0.0), // Essence (left)
+            Point3d::new(1.0, 0.0, 0.0),  // Existence (right)
         ],
         3 => vec![
-            Point3d::new(0.0, 1.0, 0.0),   // Will (top left)
-            Point3d::new(0.0, -1.0, 0.0),  // Function (bottom left)
-            Point3d::new(1.0, 0.0, 0.0),   // Being (right, midpoint vertically)
+            Point3d::new(0.0, 1.0, 0.0),  // Will (top left)
+            Point3d::new(0.0, -1.0, 0.0), // Function (bottom left)
+            Point3d::new(1.0, 0.0, 0.0),  // Being (right, midpoint vertically)
         ],
         4 => vec![
-            Point3d::new(0.0, 1.0, 0.0),   // Ideal (top)
-            Point3d::new(0.0, -1.0, 0.0),  // Ground (bottom)
-            Point3d::new(1.0, 0.0, 0.0),   // Directive (right)
-            Point3d::new(-1.0, 0.0, 0.0),  // Instrumental (left)
+            Point3d::new(0.0, 1.0, 0.0),  // Ideal (top)
+            Point3d::new(0.0, -1.0, 0.0), // Ground (bottom)
+            Point3d::new(1.0, 0.0, 0.0),  // Directive (right)
+            Point3d::new(-1.0, 0.0, 0.0), // Instrumental (left)
         ],
         5 => vec![
-            Point3d::new(-0.75, 0.0, 0.0),   // Quintessence (left-center, middle)
-            Point3d::new(1.0, -0.75, 0.0),   // Source (right, bottom)
-            Point3d::new(0.0, 0.5, 0.0),     // Higher Potential (center, upper)
-            Point3d::new(0.0, -0.5, 0.0),    // Lower Potential (center, lower)
-            Point3d::new(1.0, 0.75, 0.0),    // Purpose (right, top)
+            Point3d::new(-0.75, 0.0, 0.0),  // Quintessence (left-center, middle)
+            Point3d::new(1.0, -0.75, 0.0),  // Source (right, bottom)
+            Point3d::new(0.0, 0.5, 0.0),    // Higher Potential (center, upper)
+            Point3d::new(0.0, -0.5, 0.0),   // Lower Potential (center, lower)
+            Point3d::new(1.0, 0.75, 0.0),   // Purpose (right, top)
         ],
         6 => vec![
-            Point3d::new(-0.866, -0.5, 0.0),   // Priorities (lower left)
-            Point3d::new(0.866, -0.5, 0.0),    // Criteria (lower right)
-            Point3d::new(0.0, 1.0, 0.0),       // Values (top)
-            Point3d::new(-0.866, 0.5, 0.0),    // Resources (upper left)
-            Point3d::new(0.866, 0.5, 0.0),     // Options (upper right)
-            Point3d::new(0.0, -1.0, 0.0),      // Facts (bottom)
+            Point3d::new(-0.866, -0.5, 0.0), // Priorities (lower left)
+            Point3d::new(0.866, -0.5, 0.0),  // Criteria (lower right)
+            Point3d::new(0.0, 1.0, 0.0),     // Values (top)
+            Point3d::new(-0.866, 0.5, 0.0),  // Resources (upper left)
+            Point3d::new(0.866, 0.5, 0.0),   // Options (upper right)
+            Point3d::new(0.0, -1.0, 0.0),    // Facts (bottom)
         ],
         7 => vec![
-            Point3d::new(0.0, 1.0, 0.0),              // Insight (top center)
-            Point3d::new(-0.433884, -0.900969, 0.0),  // Application
-            Point3d::new(0.974370, -0.222521, 0.0),   // Design
-            Point3d::new(0.781831, 0.623489, 0.0),    // Research
-            Point3d::new(0.433884, -0.900969, 0.0),   // Synthesis
-            Point3d::new(-0.974370, -0.222521, 0.0),  // Delivery
-            Point3d::new(-0.781831, 0.623489, 0.0),   // Value
+            Point3d::new(0.0, 1.0, 0.0),             // Insight (top center)
+            Point3d::new(-0.433884, -0.900969, 0.0), // Application
+            Point3d::new(0.974370, -0.222521, 0.0),  // Design
+            Point3d::new(0.781831, 0.623489, 0.0),   // Research
+            Point3d::new(0.433884, -0.900969, 0.0),  // Synthesis
+            Point3d::new(-0.974370, -0.222521, 0.0), // Delivery
+            Point3d::new(-0.781831, 0.623489, 0.0),  // Value
         ],
         8 => vec![
-            Point3d::new(-0.70710678118, 0.70710678118, 0.0),   // Inherent Values (upper left)
-            Point3d::new(0.70710678118, -0.70710678118, 0.0),   // Critical Functions (lower right)
-            Point3d::new(0.70710678118, 0.70710678118, 0.0),    // Organisational Modes (upper right)
-            Point3d::new(-0.70710678118, -0.70710678118, 0.0),  // Necessary Resourcing (lower left)
-            Point3d::new(0.0, 1.0, 0.0),                        // Intrinsic Nature (top)
-            Point3d::new(1.0, 0.0, 0.0),                        // Smallest Significant Holon (right)
-            Point3d::new(-1.0, 0.0, 0.0),                       // Integrative Totality (left)
-            Point3d::new(0.0, -1.0, 0.0),                       // Supportive Platform (bottom)
+            Point3d::new(-0.70710678118, 0.70710678118, 0.0),  // Inherent Values (upper left)
+            Point3d::new(0.70710678118, -0.70710678118, 0.0),  // Critical Functions (lower right)
+            Point3d::new(0.70710678118, 0.70710678118, 0.0),   // Organisational Modes (upper right)
+            Point3d::new(-0.70710678118, -0.70710678118, 0.0), // Necessary Resourcing (lower left)
+            Point3d::new(0.0, 1.0, 0.0),                       // Intrinsic Nature (top)
+            Point3d::new(1.0, 0.0, 0.0),                       // Smallest Significant Holon (right)
+            Point3d::new(-1.0, 0.0, 0.0),                      // Integrative Totality (left)
+            Point3d::new(0.0, -1.0, 0.0),                      // Supportive Platform (bottom)
         ],
         // Ennead: 9 points arranged in a circle
         9 => vec![
-            Point3d::new(-0.64278760968, 0.76604444311, 0.0),  // Position 1: 11 o'clock (9th in sequence)
-            Point3d::new(0.86602540378, -0.5, 0.0),            // Position 2: 4 o'clock (4th in sequence)
-            Point3d::new(0.64278760968, 0.76604444311, 0.0),   // Position 3: 1 o'clock (2nd in sequence)
-            Point3d::new(-0.34202014333, -0.93969262079, 0.0), // Position 4: 7 o'clock (6th in sequence)
-            Point3d::new(0.0, 1.0, 0.0),                       // Position 5: 12 o'clock (1st in sequence)
-            Point3d::new(0.98480775301, 0.17364817767, 0.0),   // Position 6: 2 o'clock (3rd in sequence)
-            Point3d::new(-0.98480775301, 0.17364817767, 0.0),  // Position 7: 10 o'clock (8th in sequence)
-            Point3d::new(0.34202014333, -0.93969262079, 0.0),  // Position 8: 5 o'clock (5th in sequence)
-            Point3d::new(-0.86602540378, -0.5, 0.0),           // Position 9: 8 o'clock (7th in sequence)
+            Point3d::new(-0.64278760968, 0.76604444311, 0.0),  // Position 1
+            Point3d::new(0.86602540378, -0.5, 0.0),            // Position 2
+            Point3d::new(0.64278760968, 0.76604444311, 0.0),   // Position 3
+            Point3d::new(-0.34202014333, -0.93969262079, 0.0), // Position 4
+            Point3d::new(0.0, 1.0, 0.0),                       // Position 5
+            Point3d::new(0.98480775301, 0.17364817767, 0.0),   // Position 6
+            Point3d::new(-0.98480775301, 0.17364817767, 0.0),  // Position 7
+            Point3d::new(0.34202014333, -0.93969262079, 0.0),  // Position 8
+            Point3d::new(-0.86602540378, -0.5, 0.0),           // Position 9
         ],
         // Decad: 10 points arranged in a circle
         10 => vec![
-            Point3d::new(-0.80901699437, 0.58778525229, 0.0),  // Position 1: 11 o'clock (10th in sequence)
-            Point3d::new(0.80901699437, -0.58778525229, 0.0),  // Position 2: 5 o'clock (5th in sequence)
-            Point3d::new(0.30901699437, 0.95105651630, 0.0),   // Position 3: 1 o'clock (2nd in sequence)
-            Point3d::new(-0.30901699437, -0.95105651630, 0.0), // Position 4: 7 o'clock (7th in sequence)
-            Point3d::new(-0.30901699437, 0.95105651630, 0.0),  // Position 5: 12 o'clock (1st in sequence)
-            Point3d::new(0.80901699437, 0.58778525229, 0.0),   // Position 6: 2 o'clock (3rd in sequence)
-            Point3d::new(-1.0, 0.0, 0.0),                      // Position 7: 9 o'clock (9th in sequence)
-            Point3d::new(0.30901699437, -0.95105651630, 0.0),  // Position 8: 6 o'clock (6th in sequence)
-            Point3d::new(1.0, 0.0, 0.0),                       // Position 9: 3 o'clock (4th in sequence)
-            Point3d::new(-0.80901699437, -0.58778525229, 0.0), // Position 10: 8 o'clock (8th in sequence)
+            Point3d::new(-0.80901699437, 0.58778525229, 0.0),  // Position 1
+            Point3d::new(0.80901699437, -0.58778525229, 0.0),  // Position 2
+            Point3d::new(0.30901699437, 0.95105651630, 0.0),   // Position 3
+            Point3d::new(-0.30901699437, -0.95105651630, 0.0), // Position 4
+            Point3d::new(-0.30901699437, 0.95105651630, 0.0),  // Position 5
+            Point3d::new(0.80901699437, 0.58778525229, 0.0),   // Position 6
+            Point3d::new(-1.0, 0.0, 0.0),                      // Position 7
+            Point3d::new(0.30901699437, -0.95105651630, 0.0),  // Position 8
+            Point3d::new(1.0, 0.0, 0.0),                       // Position 9
+            Point3d::new(-0.80901699437, -0.58778525229, 0.0), // Position 10
         ],
         // Undecad: 11 points arranged in a circle
         11 => vec![
-            Point3d::new(-0.909632, 0.415415, 0.0),           // Position 1 (Red): 10th in sequence → 9 o'clock
-            Point3d::new(0.755750, -0.654861, 0.0),           // Position 2 (Blue): 5th in sequence → 4 o'clock
-            Point3d::new(0.54064081745, 0.84125353283, 0.0),  // Position 3 (Yellow): 2nd in sequence → 1 o'clock
-            Point3d::new(-0.281733, -0.959493, 0.0),          // Position 4 (Green): 7th in sequence → 6 o'clock
-            Point3d::new(-0.54064081745, 0.84125353283, 0.0), // Position 5 (Purple): 11th in sequence → 10 o'clock
-            Point3d::new(0.909632, 0.415415, 0.0),            // Position 6 (Orange): 3rd in sequence → 2 o'clock
-            Point3d::new(-0.989821, -0.142315, 0.0),          // Position 7 (Light Blue): 9th in sequence → 8 o'clock
-            Point3d::new(0.281733, -0.959493, 0.0),           // Position 8 (Brown): 6th in sequence → 5 o'clock
-            Point3d::new(0.989821, -0.142315, 0.0),           // Position 9 (Magenta): 4th in sequence → 3 o'clock
-            Point3d::new(-0.755750, -0.654861, 0.0),          // Position 10 (White): 8th in sequence → 7 o'clock
-            Point3d::new(0.0, 1.0, 0.0),                      // Position 11 (Silver): 1st in sequence → 12 o'clock
+            Point3d::new(-0.909632, 0.415415, 0.0),           // Position 1
+            Point3d::new(0.755750, -0.654861, 0.0),           // Position 2
+            Point3d::new(0.54064081745, 0.84125353283, 0.0),  // Position 3
+            Point3d::new(-0.281733, -0.959493, 0.0),          // Position 4
+            Point3d::new(-0.54064081745, 0.84125353283, 0.0), // Position 5
+            Point3d::new(0.909632, 0.415415, 0.0),            // Position 6
+            Point3d::new(-0.989821, -0.142315, 0.0),          // Position 7
+            Point3d::new(0.281733, -0.959493, 0.0),           // Position 8
+            Point3d::new(0.989821, -0.142315, 0.0),           // Position 9
+            Point3d::new(-0.755750, -0.654861, 0.0),          // Position 10
+            Point3d::new(0.0, 1.0, 0.0),                      // Position 11
         ],
         // Dodecad: 12 points arranged in a circle
         12 => vec![
-            Point3d::new(-0.5, 0.86602540378, 0.0),      // Position 1 (Red): 11 o'clock (12th in sequence)
-            Point3d::new(0.86602540378, -0.5, 0.0),      // Position 2 (Blue): 4 o'clock (5th in sequence)
-            Point3d::new(0.86602540378, 0.5, 0.0),       // Position 3 (Yellow): 2 o'clock (3rd in sequence)
-            Point3d::new(-0.86602540378, -0.5, 0.0),     // Position 4 (Green): 8 o'clock (9th in sequence)
-            Point3d::new(1.0, 0.0, 0.0),                 // Position 5 (Purple): 3 o'clock (4th in sequence)
-            Point3d::new(0.5, 0.86602540378, 0.0),       // Position 6 (Orange): 1 o'clock (2nd in sequence)
-            Point3d::new(0.0, -1.0, 0.0),                // Position 7 (Light Blue): 6 o'clock (7th in sequence)
-            Point3d::new(-0.5, -0.86602540378, 0.0),     // Position 8 (Brown): 7 o'clock (8th in sequence)
-            Point3d::new(0.0, 1.0, 0.0),                 // Position 9 (Magenta): 12 o'clock (1st in sequence)
-            Point3d::new(0.5, -0.86602540378, 0.0),      // Position 10 (White): 5 o'clock (6th in sequence)
-            Point3d::new(-1.0, 0.0, 0.0),                // Position 11 (Silver): 9 o'clock (10th in sequence)
-            Point3d::new(-0.86602540378, 0.5, 0.0),      // Position 12 (Gold): 10 o'clock (11th in sequence)
+            Point3d::new(-0.5, 0.86602540378, 0.0),      // Position 1
+            Point3d::new(0.86602540378, -0.5, 0.0),      // Position 2
+            Point3d::new(0.86602540378, 0.5, 0.0),       // Position 3
+            Point3d::new(-0.86602540378, -0.5, 0.0),     // Position 4
+            Point3d::new(1.0, 0.0, 0.0),                 // Position 5
+            Point3d::new(0.5, 0.86602540378, 0.0),       // Position 6
+            Point3d::new(0.0, -1.0, 0.0),                // Position 7
+            Point3d::new(-0.5, -0.86602540378, 0.0),     // Position 8
+            Point3d::new(0.0, 1.0, 0.0),                 // Position 9
+            Point3d::new(0.5, -0.86602540378, 0.0),      // Position 10
+            Point3d::new(-1.0, 0.0, 0.0),                // Position 11
+            Point3d::new(-0.86602540378, 0.5, 0.0),      // Position 12
         ],
         _ => vec![],
     }
 }
 
 /// Get position colours for an order
-/// Colors are assigned to positions starting at 12 o'clock, moving clockwise
 fn get_colours(order: u8) -> Vec<&'static str> {
     // Color palette
     const RED: &str = "#FF0000";
@@ -453,7 +565,6 @@ fn get_colours(order: u8) -> Vec<&'static str> {
     const SILVER: &str = "#C0C0C0";
     const GOLD: &str = "#FFD700";
 
-    // Colors assigned to positions clockwise from 12 o'clock
     match order {
         1 => vec![RED],
         2 => vec![RED, BLUE],
@@ -463,59 +574,20 @@ fn get_colours(order: u8) -> Vec<&'static str> {
         6 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE],
         7 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE],
         8 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN],
-        // Ennead: Sequential colours for positions 1-9
-        9 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA],
-        // Decad: Sequential colours for positions 1-10
-        10 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE],
-        // Undecad: Sequential colours for positions 1-11
-        11 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER],
-        // Dodecad: Sequential colours for positions 1-12
-        12 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER, GOLD],
+        9 => vec![
+            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA,
+        ],
+        10 => vec![
+            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE,
+        ],
+        11 => vec![
+            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
+        ],
+        12 => vec![
+            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
+            GOLD,
+        ],
         _ => vec![],
-    }
-}
-
-/// Add links (connectives and lines) for a system
-fn add_system_links(graph: &mut Graph, order: u8) {
-    // Add connective links for specific orders
-    match order {
-        3 => {
-            // Triad: Acts between terms
-            let acts = [("term_3_1", "term_3_2", "act1"), ("term_3_2", "term_3_3", "act2"), ("term_3_3", "term_3_1", "act3")];
-            for (from, to, act) in acts {
-                let char_id = format!("char_canonical_{}", act);
-                graph.add_link(Link::connective(from, to, &char_id));
-            }
-        }
-        4 => {
-            // Tetrad: Interplays between all pairs
-            let interplays = [
-                ("term_4_1", "term_4_2", "receptive_regard"),
-                ("term_4_1", "term_4_3", "effectual_compatibility"),
-                ("term_4_1", "term_4_4", "motivational_imperative"),
-                ("term_4_2", "term_4_3", "demonstrable_activity"),
-                ("term_4_2", "term_4_4", "material_mastery"),
-                ("term_4_3", "term_4_4", "technical_power"),
-            ];
-            for (from, to, name) in interplays {
-                let char_id = format!("char_canonical_{}", name);
-                graph.add_link(Link::connective(from, to, &char_id));
-            }
-        }
-        _ => {
-            // For other orders, connectives are computed from complete graph
-            // No explicit links needed - they can be derived from order+position
-        }
-    }
-
-    // Add line links between all coordinates (complete graph)
-    for i in 1..=order {
-        for j in (i + 1)..=order {
-            graph.add_link(Link::line(
-                format!("coord_{}_{}", order, i),
-                format!("coord_{}_{}", order, j),
-            ));
-        }
     }
 }
 
@@ -524,7 +596,24 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_build_graph() {
+    fn test_build_graph_has_anchors() {
+        let graph = build_graph();
+
+        // Should have Order entries
+        assert!(graph.order(1).is_some());
+        assert!(graph.order(12).is_some());
+
+        // Should have Position entries
+        assert!(graph.position(1).is_some());
+        assert!(graph.position(12).is_some());
+
+        // Should have Location entries
+        assert!(graph.location(3, 1).is_some());
+        assert!(graph.location(12, 12).is_some());
+    }
+
+    #[test]
+    fn test_build_graph_has_metadata() {
         let graph = build_graph();
 
         // Should have entries for all 12 systems
@@ -535,31 +624,63 @@ mod tests {
         assert_eq!(graph.system_name(3).unwrap().value, "Triad");
         assert_eq!(graph.coherence(3).unwrap().value, "Dynamism");
         assert_eq!(graph.term_designation(3).unwrap().value, "Impulses");
+    }
+
+    #[test]
+    fn test_build_graph_has_terms() {
+        let graph = build_graph();
 
         // Check terms exist
         let triad_terms = graph.terms(3, None);
         assert_eq!(triad_terms.len(), 3);
+
+        // Verify term references location
+        let term = graph.term(3, 1).unwrap();
+        assert_eq!(term.location, "loc_3_1");
     }
 
     #[test]
-    fn test_coordinates() {
-        let coords = get_coordinates(3);
-        assert_eq!(coords.len(), 3);
-
-        // Triad coordinates:
-        // Position 1 = Will at (0, 1, 0) - top
-        // Position 2 = Function at (0, -1, 0) - bottom
-        // Position 3 = Being at (1, 0, 0) - right
-        assert!((coords[0].x).abs() < 0.01);
-        assert!((coords[0].y - 1.0).abs() < 0.01); // y is approximately 1 (top)
-    }
-
-    #[test]
-    fn test_slices() {
+    fn test_coordinates_reference_location() {
         let graph = build_graph();
 
-        // Slice at (3, 1) should have Term, Coordinate, Colour
+        let coord = graph.coordinate(3, 1).unwrap();
+        assert_eq!(coord.location, "loc_3_1");
+    }
+
+    #[test]
+    fn test_slices_include_location() {
+        let graph = build_graph();
+
+        // Slice at (3, 1) should include Location, Term, Coordinate, Colour
         let slice = graph.slice(3, 1);
-        assert!(slice.len() >= 3);
+        assert!(slice.len() >= 4);
+
+        // Verify Location is in the slice
+        let has_location = slice.iter().any(|e| matches!(e, Entry::Location(_)));
+        assert!(has_location);
+    }
+
+    #[test]
+    fn test_locations_for_order() {
+        let graph = build_graph();
+
+        let triad_locs = graph.locations_for_order(3);
+        assert_eq!(triad_locs.len(), 3);
+
+        let dodecad_locs = graph.locations_for_order(12);
+        assert_eq!(dodecad_locs.len(), 12);
+    }
+
+    #[test]
+    fn test_locations_for_position() {
+        let graph = build_graph();
+
+        // Position 1 exists in all 12 orders
+        let pos1_locs = graph.locations_for_position(1);
+        assert_eq!(pos1_locs.len(), 12);
+
+        // Position 12 only exists in Dodecad
+        let pos12_locs = graph.locations_for_position(12);
+        assert_eq!(pos12_locs.len(), 1);
     }
 }
