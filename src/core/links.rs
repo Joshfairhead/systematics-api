@@ -14,14 +14,15 @@ pub enum LinkType {
     Connective(String), // Character ID
 }
 
-/// Link is an explicit relationship between two entries.
+/// Link is an explicit relationship between entries.
+/// Supports multiple sources and targets for future morphism types.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Link {
     pub id: String,
-    /// Entry ID of the source
-    pub base: String,
-    /// Entry ID of the target
-    pub target: String,
+    /// Entry ID(s) of the source(s)
+    pub base: Option<Vec<String>>,
+    /// Entry ID(s) of the target(s)
+    pub target: Option<Vec<String>>,
     /// Type of the link
     pub link_type: LinkType,
     /// Optional payload/tag
@@ -29,16 +30,17 @@ pub struct Link {
 }
 
 impl Link {
+    /// Create a new link with optional multiple bases and targets
     pub fn new(
         id: impl Into<String>,
-        base: impl Into<String>,
-        target: impl Into<String>,
+        base: Option<Vec<String>>,
+        target: Option<Vec<String>>,
         link_type: LinkType,
     ) -> Self {
         Self {
             id: id.into(),
-            base: base.into(),
-            target: target.into(),
+            base,
+            target,
             link_type,
             tag: None,
         }
@@ -54,7 +56,12 @@ impl Link {
         let base = base.into();
         let target = target.into();
         let id = format!("line_{}_{}", base, target);
-        Self::new(id, base, target, LinkType::Line)
+        Self::new(
+            id,
+            Some(vec![base]),
+            Some(vec![target]),
+            LinkType::Line,
+        )
     }
 
     /// Create a Connective link between two terms, referencing a Character
@@ -67,7 +74,36 @@ impl Link {
         let target = target.into();
         let character_id = character_id.into();
         let id = format!("conn_{}_{}_{}", base, target, character_id);
-        Self::new(id, base, target, LinkType::Connective(character_id))
+        Self::new(
+            id,
+            Some(vec![base]),
+            Some(vec![target]),
+            LinkType::Connective(character_id),
+        )
+    }
+
+    // =========================================================================
+    // Helper methods for accessing base/target
+    // =========================================================================
+
+    /// Get the first base ID (for single-base links)
+    pub fn base_single(&self) -> Option<&str> {
+        self.base.as_ref().and_then(|v| v.first().map(|s| s.as_str()))
+    }
+
+    /// Get the first target ID (for single-target links)
+    pub fn target_single(&self) -> Option<&str> {
+        self.target.as_ref().and_then(|v| v.first().map(|s| s.as_str()))
+    }
+
+    /// Get all base IDs
+    pub fn bases(&self) -> &[String] {
+        self.base.as_deref().unwrap_or(&[])
+    }
+
+    /// Get all target IDs
+    pub fn targets(&self) -> &[String] {
+        self.target.as_deref().unwrap_or(&[])
     }
 
     /// Check if this is a connective link
@@ -91,8 +127,8 @@ mod tests {
     #[test]
     fn test_line_link() {
         let link = Link::line("coord_3_1", "coord_3_2");
-        assert_eq!(link.base, "coord_3_1");
-        assert_eq!(link.target, "coord_3_2");
+        assert_eq!(link.base_single(), Some("coord_3_1"));
+        assert_eq!(link.target_single(), Some("coord_3_2"));
         assert!(matches!(link.link_type, LinkType::Line));
     }
 
@@ -101,11 +137,29 @@ mod tests {
         let link = Link::connective("term_3_1", "term_3_2", "char_act1");
         assert!(link.is_connective());
         assert_eq!(link.character_id(), Some("char_act1"));
+        assert_eq!(link.base_single(), Some("term_3_1"));
+        assert_eq!(link.target_single(), Some("term_3_2"));
     }
 
     #[test]
     fn test_link_with_tag() {
         let link = Link::line("a", "b").with_tag("my_tag");
         assert_eq!(link.tag, Some("my_tag".to_string()));
+    }
+
+    #[test]
+    fn test_bases_and_targets() {
+        let link = Link::line("coord_1", "coord_2");
+        assert_eq!(link.bases(), &["coord_1".to_string()]);
+        assert_eq!(link.targets(), &["coord_2".to_string()]);
+    }
+
+    #[test]
+    fn test_empty_base_target() {
+        let link = Link::new("test_id", None, None, LinkType::Line);
+        assert_eq!(link.base_single(), None);
+        assert_eq!(link.target_single(), None);
+        assert!(link.bases().is_empty());
+        assert!(link.targets().is_empty());
     }
 }
