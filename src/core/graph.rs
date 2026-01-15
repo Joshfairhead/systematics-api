@@ -335,13 +335,22 @@ impl Graph {
                     return false;
                 }
 
-                // Get the terms for base and target
+                // Get the terms for base and target using helper methods
+                let base_id = match l.base_single() {
+                    Some(id) => id,
+                    None => return false,
+                };
+                let target_id = match l.target_single() {
+                    Some(id) => id,
+                    None => return false,
+                };
+
                 let base_term = self.entries.iter().find_map(|e| match e {
-                    Entry::Term(t) if t.id == l.base => Some(t),
+                    Entry::Term(t) if t.id == base_id => Some(t),
                     _ => None,
                 });
                 let target_term = self.entries.iter().find_map(|e| match e {
-                    Entry::Term(t) if t.id == l.target => Some(t),
+                    Entry::Term(t) if t.id == target_id => Some(t),
                     _ => None,
                 });
 
@@ -368,7 +377,10 @@ impl Graph {
     pub fn connectives_for_term(&self, term_id: &str) -> Vec<&Link> {
         self.links
             .iter()
-            .filter(|l| l.is_connective() && (l.base == term_id || l.target == term_id))
+            .filter(|l| {
+                l.is_connective()
+                    && (l.base_single() == Some(term_id) || l.target_single() == Some(term_id))
+            })
             .collect()
     }
 
@@ -382,8 +394,13 @@ impl Graph {
                 }
 
                 // Check that base coordinate is in the specified order
+                let base_id = match l.base_single() {
+                    Some(id) => id,
+                    None => return false,
+                };
+
                 self.entries.iter().any(|e| match e {
-                    Entry::Coordinate(c) if c.id == l.base => c.order_value() == Some(order),
+                    Entry::Coordinate(c) if c.id == base_id => c.order_value() == Some(order),
                     _ => false,
                 })
             })

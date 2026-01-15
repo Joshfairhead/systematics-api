@@ -496,13 +496,13 @@ impl GqlLink {
     }
 
     /// Base (source) entry ID
-    async fn base_id(&self) -> &str {
-        &self.link.base
+    async fn base_id(&self) -> Option<&str> {
+        self.link.base_single()
     }
 
     /// Target entry ID
-    async fn target_id(&self) -> &str {
-        &self.link.target
+    async fn target_id(&self) -> Option<&str> {
+        self.link.target_single()
     }
 
     /// Link type
@@ -525,12 +525,16 @@ impl GqlLink {
 
     /// Base entry
     async fn base(&self) -> Option<GqlEntry> {
-        self.graph.get_entry(&self.link.base).map(|e| GqlEntry::new(e.clone(), &self.graph))
+        self.link.base_single()
+            .and_then(|id| self.graph.get_entry(id))
+            .map(|e| GqlEntry::new(e.clone(), &self.graph))
     }
 
     /// Target entry
     async fn target(&self) -> Option<GqlEntry> {
-        self.graph.get_entry(&self.link.target).map(|e| GqlEntry::new(e.clone(), &self.graph))
+        self.link.target_single()
+            .and_then(|id| self.graph.get_entry(id))
+            .map(|e| GqlEntry::new(e.clone(), &self.graph))
     }
 
     /// Character (for connective links)
@@ -542,28 +546,32 @@ impl GqlLink {
 
     /// Order of this link (derived from base entry)
     async fn order(&self) -> Option<i32> {
-        self.graph.get_entry(&self.link.base)
+        self.link.base_single()
+            .and_then(|id| self.graph.get_entry(id))
             .and_then(|e| e.order())
             .map(|o| o as i32)
     }
 
     /// Base position (derived from base entry)
     async fn base_position(&self) -> Option<i32> {
-        self.graph.get_entry(&self.link.base)
+        self.link.base_single()
+            .and_then(|id| self.graph.get_entry(id))
             .and_then(|e| e.position())
             .map(|p| p as i32)
     }
 
     /// Target position (derived from target entry)
     async fn target_position(&self) -> Option<i32> {
-        self.graph.get_entry(&self.link.target)
+        self.link.target_single()
+            .and_then(|id| self.graph.get_entry(id))
             .and_then(|e| e.position())
             .map(|p| p as i32)
     }
 
     /// Base coordinate (for line links, returns the coordinate directly; for other links, looks up by position)
     async fn base_coordinate(&self) -> Option<GqlCoordinate> {
-        let base_entry = self.graph.get_entry(&self.link.base)?;
+        let base_id = self.link.base_single()?;
+        let base_entry = self.graph.get_entry(base_id)?;
 
         // If this is a line link, base IS the coordinate
         if let Entry::Coordinate(coord) = base_entry {
@@ -579,7 +587,8 @@ impl GqlLink {
 
     /// Target coordinate (for line links, returns the coordinate directly; for other links, looks up by position)
     async fn target_coordinate(&self) -> Option<GqlCoordinate> {
-        let target_entry = self.graph.get_entry(&self.link.target)?;
+        let target_id = self.link.target_single()?;
+        let target_entry = self.graph.get_entry(target_id)?;
 
         // If this is a line link, target IS the coordinate
         if let Entry::Coordinate(coord) = target_entry {
@@ -595,7 +604,8 @@ impl GqlLink {
 
     /// Base slice (term + coordinate + colour at base position)
     async fn base_slice(&self) -> Option<GqlSlice> {
-        let base_entry = self.graph.get_entry(&self.link.base)?;
+        let base_id = self.link.base_single()?;
+        let base_entry = self.graph.get_entry(base_id)?;
         let order = base_entry.order()?;
         let position = base_entry.position()?;
         Some(GqlSlice::new(order, position, self.graph.clone()))
@@ -603,7 +613,8 @@ impl GqlLink {
 
     /// Target slice (term + coordinate + colour at target position)
     async fn target_slice(&self) -> Option<GqlSlice> {
-        let target_entry = self.graph.get_entry(&self.link.target)?;
+        let target_id = self.link.target_single()?;
+        let target_entry = self.graph.get_entry(target_id)?;
         let order = target_entry.order()?;
         let position = target_entry.position()?;
         Some(GqlSlice::new(order, position, self.graph.clone()))
@@ -611,9 +622,18 @@ impl GqlLink {
 
     /// Get the corresponding line link (for connectives) or connective (for lines)
     async fn corresponding_links(&self) -> Vec<GqlLink> {
-        let base_pos = self.graph.get_entry(&self.link.base).and_then(|e| e.position());
-        let target_pos = self.graph.get_entry(&self.link.target).and_then(|e| e.position());
-        let order = self.graph.get_entry(&self.link.base).and_then(|e| e.order());
+        let base_id = match self.link.base_single() {
+            Some(id) => id,
+            None => return vec![],
+        };
+        let target_id = match self.link.target_single() {
+            Some(id) => id,
+            None => return vec![],
+        };
+
+        let base_pos = self.graph.get_entry(base_id).and_then(|e| e.position());
+        let target_pos = self.graph.get_entry(target_id).and_then(|e| e.position());
+        let order = self.graph.get_entry(base_id).and_then(|e| e.order());
 
         match (order, base_pos, target_pos) {
             (Some(ord), Some(bp), Some(tp)) => {
@@ -624,8 +644,16 @@ impl GqlLink {
                             return false;
                         }
                         // Check if this link connects the same positions
-                        let l_base = self.graph.get_entry(&l.base);
-                        let l_target = self.graph.get_entry(&l.target);
+                        let l_base_id = match l.base_single() {
+                            Some(id) => id,
+                            None => return false,
+                        };
+                        let l_target_id = match l.target_single() {
+                            Some(id) => id,
+                            None => return false,
+                        };
+                        let l_base = self.graph.get_entry(l_base_id);
+                        let l_target = self.graph.get_entry(l_target_id);
                         match (l_base, l_target) {
                             (Some(lb), Some(lt)) => {
                                 lb.order() == Some(ord) &&

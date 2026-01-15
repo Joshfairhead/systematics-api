@@ -279,6 +279,88 @@ fn add_canonical_characters(graph: &mut Graph) {
         )));
     }
 
+    // Connective characters for Pentad (Mutualities)
+    for value in [
+        "Range of Potential",
+        "Range of Significance",
+        "Aspiration",
+        "Operation",
+        "Output",
+        "Input",
+        "Qualitative Match",
+        "Quantitative Match",
+        "Form",
+        "Function",
+    ] {
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            value,
+        )));
+    }
+
+    // Connective characters for Hexad (Steps) - placeholders
+    for i in 1..=15 {
+        let value = format!("Step {} Needs Research", i);
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            &value,
+        )));
+    }
+
+    // Connective characters for Heptad (Intervals) - placeholders
+    for i in 1..=21 {
+        let value = format!("Interval {} Needs Research", i);
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            &value,
+        )));
+    }
+
+    // Connective characters for Octad (Components) - placeholders
+    for i in 1..=28 {
+        let value = format!("Component {} Needs Research", i);
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            &value,
+        )));
+    }
+
+    // Connective characters for Ennead (Transmutations) - placeholders
+    for i in 1..=36 {
+        let value = format!("Transmutation {} Needs Research", i);
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            &value,
+        )));
+    }
+
+    // Connective characters for Decad (Progressions) - placeholders
+    for i in 1..=45 {
+        let value = format!("Progression {} Needs Research", i);
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            &value,
+        )));
+    }
+
+    // Connective characters for Undecad (Correlations) - placeholders
+    for i in 1..=55 {
+        let value = format!("Correlation {} Needs Research", i);
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            &value,
+        )));
+    }
+
+    // Connective characters for Dodecad (Harmonies) - placeholders
+    for i in 1..=66 {
+        let value = format!("Harmony {} Needs Research", i);
+        graph.add_entry(Entry::Character(Character::with_auto_id(
+            Language::Canonical,
+            &value,
+        )));
+    }
+
     // Generic terms for orders 9-12
     for i in 1..=12 {
         let value = format!("Term {}", i);
@@ -347,10 +429,31 @@ fn add_system_links(graph: &mut Graph, order: u8) {
                 graph.add_link(Link::connective(from, to, &char_id));
             }
         }
-        _ => {
-            // For other orders, connectives are computed from complete graph
-            // No explicit links needed - they can be derived from order+position
+        5 => {
+            // Pentad: Mutualities (10 named connectives)
+            // Term positions: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
+            let mutualities = [
+                ("term_5_3", "term_5_4", "range_of_potential"),        // Higher Potential → Lower Potential
+                ("term_5_5", "term_5_2", "range_of_significance"),     // Purpose → Source
+                ("term_5_1", "term_5_3", "aspiration"),                // Quintessence → Higher Potential
+                ("term_5_1", "term_5_4", "operation"),                 // Quintessence → Lower Potential
+                ("term_5_3", "term_5_5", "output"),                    // Higher Potential → Purpose
+                ("term_5_4", "term_5_2", "input"),                     // Lower Potential → Source
+                ("term_5_1", "term_5_5", "qualitative_match"),         // Quintessence → Purpose
+                ("term_5_1", "term_5_2", "quantitative_match"),        // Quintessence → Source
+                ("term_5_4", "term_5_5", "form"),                      // Lower Potential → Purpose
+                ("term_5_3", "term_5_2", "function"),                  // Higher Potential → Source
+            ];
+            for (from, to, name) in mutualities {
+                let char_id = format!("char_canonical_{}", name);
+                graph.add_link(Link::connective(from, to, &char_id));
+            }
         }
+        6..=12 => {
+            // Higher orders: Add placeholder connective links for all term pairs
+            add_placeholder_connectives(graph, order);
+        }
+        _ => {}
     }
 
     // Add line links between all coordinates (complete graph)
@@ -360,6 +463,31 @@ fn add_system_links(graph: &mut Graph, order: u8) {
                 format!("coord_{}_{}", order, i),
                 format!("coord_{}_{}", order, j),
             ));
+        }
+    }
+}
+
+/// Add placeholder connective links for orders 6-12
+fn add_placeholder_connectives(graph: &mut Graph, order: u8) {
+    let (prefix, _designation) = match order {
+        6 => ("step", "Steps"),
+        7 => ("interval", "Intervals"),
+        8 => ("component", "Components"),
+        9 => ("transmutation", "Transmutations"),
+        10 => ("progression", "Progressions"),
+        11 => ("correlation", "Correlations"),
+        12 => ("harmony", "Harmonies"),
+        _ => return,
+    };
+
+    let mut idx = 1;
+    for i in 1..=order {
+        for j in (i + 1)..=order {
+            let from = format!("term_{}_{}", order, i);
+            let to = format!("term_{}_{}", order, j);
+            let char_id = format!("char_canonical_{}_{}_needs_research", prefix, idx);
+            graph.add_link(Link::connective(&from, &to, &char_id));
+            idx += 1;
         }
     }
 }
